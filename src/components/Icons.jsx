@@ -1,4 +1,4 @@
-// Iconos SVG (trazo) compartidos por la interfaz.
+// Stroke-based SVG icons shared across the interface.
 
 function Svg({ strokeWidth = 2, children }) {
   return (

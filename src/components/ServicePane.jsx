@@ -11,7 +11,7 @@ export default function ServicePane({ services, activeId, filter, onFilter, onSe
           <SearchIcon />
           <input
             type="search"
-            placeholder="Filtrar servicios…"
+            placeholder="Filter services…"
             autoComplete="off"
             value={filter}
             onChange={e => onFilter(e.target.value)}
@@ -19,7 +19,7 @@ export default function ServicePane({ services, activeId, filter, onFilter, onSe
         </div>
       </div>
       <nav className="svc-list">
-        {list.length === 0 && <div className="empty">Sin servicios.</div>}
+        {list.length === 0 && <div className="empty">No services.</div>}
         {list.map(s => (
           <button key={s.id} className="row" aria-current={activeId === s.id} onClick={() => onSelect(s)}>
             <span style={{ flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>

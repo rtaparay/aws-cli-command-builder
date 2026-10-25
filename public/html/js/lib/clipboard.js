@@ -1,11 +1,11 @@
-// Copia texto al portapapeles; usa un textarea oculto como respaldo.
+// Copies text to the clipboard; uses a hidden textarea as a fallback.
 async function copyText(text) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     try {
       await navigator.clipboard.writeText(text);
       return true;
     } catch (e) {
-      // Cae al respaldo de abajo.
+      // Falls back to the method below.
     }
   }
   const area = document.createElement("textarea");

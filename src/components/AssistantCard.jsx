@@ -4,7 +4,7 @@ import { loadSettings } from '../hooks/useAssistant.js';
 
 const KEY_PLACEHOLDERS = { gemini: "AIza…", claude: "sk-ant-…", openai: "sk-…", custom: "—" };
 
-// Separa el texto de la IA en bloques de texto y bloques de código (```).
+// Splits the AI text into text blocks and code blocks (```).
 function AssistantContent({ content, onCopy }) {
   const parts = String(content).split("```");
   const nodes = parts.map((part, i) => {
@@ -14,7 +14,7 @@ function AssistantContent({ content, onCopy }) {
         <div key={i} className="ai-code">
           <code>{code}</code>
           <div className="ai-code-acts">
-            <button className="ai-mini" onClick={() => onCopy(code)}>Copiar</button>
+            <button className="ai-mini" onClick={() => onCopy(code)}>Copy</button>
           </div>
         </div>
       );
@@ -44,7 +44,7 @@ function ConfigPanel({ config, onSave }) {
     <div className="ai-cfg">
       <div className="ai-cfg-row">
         <label>
-          Proveedor
+          Provider
           <select value={draft.provider} onChange={e => changeProvider(e.target.value)}>
             {Object.entries(AI_PROVIDERS).map(([k, v]) => (
               <option key={k} value={k}>{v.label}</option>
@@ -52,7 +52,7 @@ function ConfigPanel({ config, onSave }) {
           </select>
         </label>
         <label>
-          Modelo
+          Model
           <input
             type="text"
             value={draft.model}
@@ -65,7 +65,7 @@ function ConfigPanel({ config, onSave }) {
       </div>
       <div className="ai-cfg-row">
         <label>
-          Clave API
+          API key
           <input
             type="password"
             value={draft.key}
@@ -76,7 +76,7 @@ function ConfigPanel({ config, onSave }) {
         </label>
         {provider.needsBase && (
           <label>
-            URL base
+            Base URL
             <input
               type="text"
               value={draft.base}
@@ -89,16 +89,16 @@ function ConfigPanel({ config, onSave }) {
         )}
       </div>
       <div className="ai-cfg-foot">
-        <span className="ai-hint">La clave se guarda solo en este navegador.</span>
+        <span className="ai-hint">The key is stored only in this browser.</span>
         <button className="ai-mini solid" onClick={() => onSave({ ...draft, key: draft.key.trim(), model: draft.model.trim(), base: draft.base.trim() })}>
-          Guardar
+          Save
         </button>
       </div>
     </div>
   );
 }
 
-// Chat del asistente de IA. El estado vive en useAssistant (App), así sobrevive a la navegación.
+// AI assistant chat. State lives in useAssistant (App), so it survives navigation.
 export default function AssistantCard({ assistant, onCopy }) {
   const { config, messages, draft, setDraft, busy, cfgOpen, toggleCfg, clear, send, saveConfig } = assistant;
   const transcriptRef = useRef(null);
@@ -114,14 +114,14 @@ export default function AssistantCard({ assistant, onCopy }) {
         <div className="ai-title">
           <span className="ai-badge">AI</span>
           <div style={{ minWidth: 0 }}>
-            <div className="ai-h1">Asistente IA — Comandos AWS CLI</div>
-            <div className="ai-h2">Describe qué quieres hacer en AWS y la IA te dará el comando.</div>
+            <div className="ai-h1">AI Assistant — AWS CLI Commands</div>
+            <div className="ai-h2">Describe what you want to do in AWS and the AI will give you the command.</div>
           </div>
         </div>
         <div className="ai-head-acts">
           <span className="ai-prov">{provider.label}</span>
-          <button className="ai-mini" onClick={clear}>Limpiar chat</button>
-          <button className="ai-mini" onClick={toggleCfg}>Configurar</button>
+          <button className="ai-mini" onClick={clear}>Clear chat</button>
+          <button className="ai-mini" onClick={toggleCfg}>Settings</button>
         </div>
       </div>
 
@@ -129,11 +129,11 @@ export default function AssistantCard({ assistant, onCopy }) {
 
       <div className="ai-transcript" ref={transcriptRef}>
         {messages.length === 0 ? (
-          <div className="ai-empty">Configura un proveedor y una clave API para empezar.</div>
+          <div className="ai-empty">Configure a provider and an API key to get started.</div>
         ) : (
           messages.map((m, i) => (
             <div key={i} className={"ai-msg " + m.role}>
-              <span className="ai-who">{m.role === "user" ? "Tú" : "IA"}</span>
+              <span className="ai-who">{m.role === "user" ? "You" : "AI"}</span>
               <div className="ai-bubble">
                 {m.role === "assistant" ? <AssistantContent content={m.content} onCopy={onCopy} /> : <Lines text={m.content} />}
               </div>
@@ -142,8 +142,8 @@ export default function AssistantCard({ assistant, onCopy }) {
         )}
         {busy && (
           <div className="ai-msg assistant">
-            <span className="ai-who">IA</span>
-            <div className="ai-bubble ai-thinking">Pensando…</div>
+            <span className="ai-who">AI</span>
+            <div className="ai-bubble ai-thinking">Thinking…</div>
           </div>
         )}
       </div>
@@ -159,11 +159,11 @@ export default function AssistantCard({ assistant, onCopy }) {
               send();
             }
           }}
-          placeholder="Describe qué quieres hacer en AWS… (ej. listar buckets de S3)"
+          placeholder="Describe what you want to do in AWS… (e.g. list S3 buckets)"
         />
-        <button className="ai-send" disabled={busy} onClick={send}>Enviar</button>
+        <button className="ai-send" disabled={busy} onClick={send}>Send</button>
       </div>
-      <div className="ai-foot">Solo genera comandos de AWS CLI v2. Revisa cada comando antes de ejecutarlo.</div>
+      <div className="ai-foot">Only generates AWS CLI v2 commands. Review each command before running it.</div>
     </div>
   );
 }

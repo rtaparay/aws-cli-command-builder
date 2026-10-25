@@ -41,19 +41,19 @@
       <button
         class="icon-btn"
         id="btn-sidebar"
-        title="Ocultar / mostrar menú"
+        title="Hide / show menu"
         data-icon="sidebar"
       ></button>
       <button
         class="icon-btn"
         id="btn-home"
-        title="Inicio"
+        title="Home"
         data-icon="home"
       ></button>
       <button
         class="icon-btn"
         id="btn-gopts"
-        title="Opciones globales"
+        title="Global options"
         data-icon="gear"
       ></button>
       <div class="topsearch">
@@ -61,13 +61,13 @@
         <input
           id="search"
           type="search"
-          placeholder="Buscar comandos…"
+          placeholder="Search commands…"
           autocomplete="off"
           spellcheck="false"
         />
       </div>
       <span class="spacer"></span>
-      <button class="icon-btn" id="btn-theme" title="Cambiar tema"></button>
+      <button class="icon-btn" id="btn-theme" title="Toggle theme"></button>
     </header>
 
     <div class="shell" id="shell">
@@ -78,7 +78,7 @@
             <input
               id="svc-filter"
               type="search"
-              placeholder="Filtrar servicios…"
+              placeholder="Filter services…"
               autocomplete="off"
             />
           </div>
@@ -93,7 +93,7 @@
             <input
               id="cmd-filter"
               type="search"
-              placeholder="Filtrar comandos…"
+              placeholder="Filter commands…"
               autocomplete="off"
             />
           </div>
@@ -105,27 +105,27 @@
     </div>
 
     <div class="gopts-overlay" id="gopts-overlay" hidden></div>
-    <aside class="gopts" id="gopts" hidden aria-label="Opciones globales">
+    <aside class="gopts" id="gopts" hidden aria-label="Global options">
       <div class="gopts-h">
         <div>
-          <div class="gopts-t">Opciones globales</div>
+          <div class="gopts-t">Global options</div>
           <div class="gopts-s">
-            Opciones aceptadas por todo comando de AWS CLI. Se aplican a cada
-            comando que construyes y persisten entre páginas.
+            Options accepted by every AWS CLI command. They are applied to each
+            command you build and persist across pages.
           </div>
         </div>
-        <button class="gopts-x" id="gopts-close" aria-label="Cerrar">✕</button>
+        <button class="gopts-x" id="gopts-close" aria-label="Close">✕</button>
       </div>
       <div class="gopts-b" id="gopts-body"></div>
       <div class="gopts-foot">
-        <span>Guardado en este dispositivo.</span>
-        <button class="gopts-clear" id="gopts-clear">Limpiar todo</button>
+        <span>Saved on this device.</span>
+        <button class="gopts-clear" id="gopts-clear">Clear all</button>
       </div>
     </aside>
 
     <div class="toast" id="toast"></div>
 
-    <!-- Orden importante: cada archivo usa las funciones y constantes de los anteriores. -->
+    <!-- Order matters: each file uses the functions and constants of the ones before it. -->
     <script src="js/data/sampleCatalog.js"></script>
     <script src="js/lib/storage.js"></script>
     <script src="js/lib/clipboard.js"></script>

@@ -73,8 +73,8 @@ function Section({ title, count, children }) {
   );
 }
 
-// Detalle de un comando: formulario de parámetros, vista previa y botón de copiar.
-// Se monta con key por comando para reiniciar secciones y valores al cambiar de comando.
+// Command detail: parameter form, preview, and copy button.
+// Mounted with a key per command so sections and values reset when the command changes.
 export default function CommandDetail({ svc, cmd, values, globals, onChange, onCopy }) {
   const miss = missingCount(cmd, values);
   const field = (p, required) => (
@@ -97,10 +97,10 @@ export default function CommandDetail({ svc, cmd, values, globals, onChange, onC
       <div className="preview">
         <div className="preview-h">
           <span className="t">
-            <span className="pr">&gt;_</span> Vista previa del comando
+            <span className="pr">&gt;_</span> Command preview
           </span>
           <span className="acts">
-            <button title="Copiar" onClick={() => onCopy(previewPlain(svc, cmd, values, globals))}>
+            <button title="Copy" onClick={() => onCopy(previewPlain(svc, cmd, values, globals))}>
               <CopyIcon />
             </button>
           </span>
@@ -108,25 +108,25 @@ export default function CommandDetail({ svc, cmd, values, globals, onChange, onC
         {miss > 0 && (
           <div className="warn">
             <WarnIcon />
-            {miss} parámetro{miss > 1 ? "s" : ""} requerido{miss > 1 ? "s" : ""} sin completar
+            {miss} required parameter{miss > 1 ? "s" : ""} missing
           </div>
         )}
         <Preview svc={svc} cmd={cmd} values={values} globals={globals} />
       </div>
 
       {cmd.required.length > 0 && (
-        <Section title="Parámetros requeridos" count={cmd.required.length}>
+        <Section title="Required parameters" count={cmd.required.length}>
           {cmd.required.map(p => field(p, true))}
         </Section>
       )}
       {cmd.optional.length > 0 && (
-        <Section title="Parámetros opcionales" count={cmd.optional.length}>
+        <Section title="Optional parameters" count={cmd.optional.length}>
           {cmd.optional.map(p => field(p, false))}
         </Section>
       )}
 
       <div className="note">
-        Esta es una <b>recreación funcional</b> del patrón de constructor de comandos. Los datos son un subconjunto de ejemplo del catálogo de <b>AWS CLI v2</b>. El catálogo completo se genera desde los <b>service models de botocore</b> (JSON, Apache-2.0) — no hay llamadas a AWS en esta página; solo compone la cadena <code>aws …</code>.
+        This is a <b>functional recreation</b> of the command builder pattern. The data is a sample subset of the <b>AWS CLI v2</b> catalog. The full catalog is generated from the <b>botocore service models</b> (JSON, Apache-2.0) — this page makes no calls to AWS; it only composes the <code>aws …</code> string.
       </div>
     </div>
   );

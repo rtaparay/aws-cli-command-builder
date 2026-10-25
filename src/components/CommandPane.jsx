@@ -1,6 +1,6 @@
 import { SearchIcon } from './Icons.jsx';
 
-// Lista de comandos del servicio activo (o de la búsqueda global).
+// List of commands for the active service (or the global search).
 export default function CommandPane({ paneRef, home, filter, onFilter, items, activeCmd, onSelect }) {
   return (
     <section className="pane cmds" ref={paneRef}>
@@ -9,7 +9,7 @@ export default function CommandPane({ paneRef, home, filter, onFilter, items, ac
           <SearchIcon />
           <input
             type="search"
-            placeholder="Filtrar comandos…"
+            placeholder="Filter commands…"
             autoComplete="off"
             value={filter}
             onChange={e => onFilter(e.target.value)}
@@ -18,7 +18,7 @@ export default function CommandPane({ paneRef, home, filter, onFilter, items, ac
       </div>
       <div className="cmd-list">
         {home ? null : items.length === 0 ? (
-          <div className="empty">Sin comandos.</div>
+          <div className="empty">No commands.</div>
         ) : (
           items.map(x => (
             <button

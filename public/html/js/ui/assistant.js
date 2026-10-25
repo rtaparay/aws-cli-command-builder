@@ -1,10 +1,10 @@
-// Chat del asistente de IA. El estado vive en state.assistant (app.js), así sobrevive a la navegación.
+// AI assistant chat. State lives in state.assistant (app.js), so it survives navigation.
 const KEY_PLACEHOLDERS = { gemini: "AIza…", claude: "sk-ant-…", openai: "sk-…", custom: "—" };
 
-// Referencias a los elementos del asistente mientras la pantalla de inicio está montada.
+// References to the assistant elements while the home screen is mounted.
 let assistantView = null;
 
-// Separa el texto de la IA en bloques de texto y bloques de código (```).
+// Splits the AI text into text blocks and code blocks (```).
 function assistantContent(content) {
   const parts = String(content).split("```");
   const nodes = parts
@@ -14,7 +14,7 @@ function assistantContent(content) {
         return h("div", { class: "ai-code" },
           h("code", null, code),
           h("div", { class: "ai-code-acts" },
-            h("button", { class: "ai-mini", onclick: () => copy(code) }, "Copiar"),
+            h("button", { class: "ai-mini", onclick: () => copy(code) }, "Copy"),
           ),
         );
       }
@@ -42,8 +42,8 @@ function buildConfigPanel(config) {
 
     panel.replaceChildren(
       h("div", { class: "ai-cfg-row" },
-        h("label", null, "Proveedor", select),
-        h("label", null, "Modelo",
+        h("label", null, "Provider", select),
+        h("label", null, "Model",
           h("input", {
             type: "text",
             value: draft.model,
@@ -55,7 +55,7 @@ function buildConfigPanel(config) {
         ),
       ),
       h("div", { class: "ai-cfg-row" },
-        h("label", null, "Clave API",
+        h("label", null, "API key",
           h("input", {
             type: "password",
             value: draft.key,
@@ -87,7 +87,7 @@ function buildConfigPanel(config) {
             model: draft.model.trim(),
             base: draft.base.trim(),
           }),
-        }, "Guardar"),
+        }, "Save"),
       ),
     );
   };
@@ -102,7 +102,7 @@ function buildAssistantCard() {
   const cfgSlot = h("div");
   const textarea = h("textarea", {
     rows: "2",
-    placeholder: "Describe qué quieres hacer en AWS… (ej. listar buckets de S3)",
+    placeholder: "Describe what you want to do in AWS… (e.g. list S3 buckets)",
     value: state.assistant.draft,
     oninput: e => (state.assistant.draft = e.target.value),
     onkeydown: e => {
@@ -112,7 +112,7 @@ function buildAssistantCard() {
       }
     },
   });
-  const send = h("button", { class: "ai-send", onclick: sendMessage }, "Enviar");
+  const send = h("button", { class: "ai-send", onclick: sendMessage }, "Send");
 
   assistantView = { prov, transcript, cfgSlot, textarea, send };
 
@@ -121,20 +121,20 @@ function buildAssistantCard() {
       h("div", { class: "ai-title" },
         h("span", { class: "ai-badge" }, "AI"),
         h("div", { style: { minWidth: "0" } },
-          h("div", { class: "ai-h1" }, "Asistente IA — Comandos AWS CLI"),
-          h("div", { class: "ai-h2" }, "Describe qué quieres hacer en AWS y la IA te dará el comando."),
+          h("div", { class: "ai-h1" }, "AI Assistant — AWS CLI Commands"),
+          h("div", { class: "ai-h2" }, "Describe what you want to do in AWS and the AI will give you the command."),
         ),
       ),
       h("div", { class: "ai-head-acts" },
         prov,
-        h("button", { class: "ai-mini", onclick: clearChat }, "Limpiar chat"),
-        h("button", { class: "ai-mini", onclick: toggleCfg }, "Configurar"),
+        h("button", { class: "ai-mini", onclick: clearChat }, "Clear chat"),
+        h("button", { class: "ai-mini", onclick: toggleCfg }, "Settings"),
       ),
     ),
     cfgSlot,
     transcript,
     h("div", { class: "ai-input" }, textarea, send),
-    h("div", { class: "ai-foot" }, "Solo genera comandos de AWS CLI v2. Revisa cada comando antes de ejecutarlo."),
+    h("div", { class: "ai-foot" }, "Only generates AWS CLI v2 commands. Review each command before running it."),
   );
 
   renderConfigSlot();
@@ -145,18 +145,18 @@ function buildAssistantCard() {
 function renderTranscript() {
   const { messages, busy } = state.assistant;
   const nodes = messages.length === 0
-    ? [h("div", { class: "ai-empty" }, "Configura un proveedor y una clave API para empezar.")]
+    ? [h("div", { class: "ai-empty" }, "Configure a provider and an API key to get started.")]
     : messages.map(m =>
         h("div", { class: "ai-msg " + m.role },
-          h("span", { class: "ai-who" }, m.role === "user" ? "Tú" : "IA"),
+          h("span", { class: "ai-who" }, m.role === "user" ? "You" : "AI"),
           h("div", { class: "ai-bubble" }, m.role === "assistant" ? assistantContent(m.content) : lines(m.content)),
         ),
       );
   if (busy) {
     nodes.push(
       h("div", { class: "ai-msg assistant" },
-        h("span", { class: "ai-who" }, "IA"),
-        h("div", { class: "ai-bubble ai-thinking" }, "Pensando…"),
+        h("span", { class: "ai-who" }, "AI"),
+        h("div", { class: "ai-bubble ai-thinking" }, "Thinking…"),
       ),
     );
   }
@@ -202,7 +202,7 @@ async function sendMessage() {
   const text = a.draft.trim();
   if (a.busy || !text) return;
   if (a.config.provider !== "custom" && !a.config.key) {
-    a.messages.push({ role: "assistant", content: "⚠️ Falta la clave API." });
+    a.messages.push({ role: "assistant", content: "⚠️ Missing API key." });
     a.cfgOpen = true;
     renderConfigSlot();
     renderAssistant();
@@ -216,7 +216,7 @@ async function sendMessage() {
     const reply = await askAssistant(a.config, a.messages);
     a.messages.push({ role: "assistant", content: reply || "…" });
   } catch (e) {
-    a.messages.push({ role: "assistant", content: "⚠️ Error al consultar la IA: " + ((e && e.message) ? e.message : e) });
+    a.messages.push({ role: "assistant", content: "⚠️ Error querying the AI: " + ((e && e.message) ? e.message : e) });
   }
   a.busy = false;
   renderAssistant();

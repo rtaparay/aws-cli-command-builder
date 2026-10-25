@@ -1,4 +1,4 @@
-// Iconos SVG (trazo) compartidos por la interfaz.
+// Stroke-based SVG icons shared across the interface.
 const ICON_PATHS = {
   search: '<circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" />',
   sidebar: '<rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" />',
@@ -14,7 +14,7 @@ const ICON_PATHS = {
   source: '<path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0" /><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />',
 };
 
-// Devuelve un <svg> nuevo con el trazo indicado.
+// Returns a new <svg> with the given stroke.
 function icon(name) {
   const strokeWidth = name === "cmd" ? 2.2 : 2;
   const t = document.createElement("template");

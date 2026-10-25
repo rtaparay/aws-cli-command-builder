@@ -1,6 +1,6 @@
 const CLI = "aws";
 
-// Partes del comando: parámetros requeridos (con marcador si faltan), opcionales con valor y globales.
+// Command parts: required parameters (with a placeholder if missing), optional ones with a value, and globals.
 function commandParts(cmd, values, globals) {
   const parts = [];
   cmd.required.forEach(p => {
@@ -15,7 +15,7 @@ function commandParts(cmd, values, globals) {
   return parts;
 }
 
-// Comando en texto plano, listo para copiar.
+// Command as plain text, ready to copy.
 function previewPlain(svc, cmd, values, globals) {
   const parts = commandParts(cmd, values, globals).map(p => (p.val == null ? p.flag : `${p.flag} ${p.val}`));
   return `${CLI} ${svc.id} ${cmd.name}${parts.length ? " " + parts.join(" ") : ""}`;

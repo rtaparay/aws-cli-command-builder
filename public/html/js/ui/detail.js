@@ -1,5 +1,5 @@
-// Detalle de un comando: formulario de parámetros, vista previa y botón de copiar.
-// Solo existe un comando montado a la vez; detailRefs apunta a su caja de vista previa.
+// Command detail: parameter form, preview, and copy button.
+// Only one command is mounted at a time; detailRefs points to its preview box.
 let detailRefs = null;
 
 function previewBody(svc, cmd, parts) {
@@ -25,7 +25,7 @@ function previewBody(svc, cmd, parts) {
   return h("div", { class: "preview-body" }, rows.flatMap((row, i) => (i > 0 ? ["\n", row] : [row])));
 }
 
-// Vuelve a pintar la vista previa y el aviso de parámetros requeridos (sin reconstruir el formulario).
+// Repaints the preview and the missing required parameters warning (without rebuilding the form).
 function updatePreview() {
   if (!detailRefs) return;
   const { activeSvc: svc, activeCmd: cmd, values, globals } = state;
@@ -36,7 +36,7 @@ function updatePreview() {
     box.append(
       h("div", { class: "warn" },
         icon("warn"),
-        `${miss} parámetro${miss > 1 ? "s" : ""} requerido${miss > 1 ? "s" : ""} sin completar`,
+        `${miss} required parameter${miss > 1 ? "s" : ""} missing`,
       ),
     );
   }
@@ -81,10 +81,10 @@ function section(title, params, required) {
 function buildCommandDetail(svc, cmd) {
   const box = h("div", { class: "preview" },
     h("div", { class: "preview-h" },
-      h("span", { class: "t" }, h("span", { class: "pr" }, ">_"), " Vista previa del comando"),
+      h("span", { class: "t" }, h("span", { class: "pr" }, ">_"), " Command preview"),
       h("span", { class: "acts" },
         h("button", {
-          title: "Copiar",
+          title: "Copy",
           onclick: () => copy(previewPlain(svc, cmd, state.values, state.globals)),
         }, icon("copy")),
       ),
@@ -94,14 +94,14 @@ function buildCommandDetail(svc, cmd) {
 
   const note = h("div", { class: "note" });
   note.innerHTML =
-    'Esta es una <b>recreación funcional</b> del patrón de constructor de comandos. Los datos son un subconjunto de ejemplo del catálogo de <b>AWS CLI v2</b>. El catálogo completo se genera desde los <b>service models de botocore</b> (JSON, Apache-2.0) — no hay llamadas a AWS en esta página; solo compone la cadena <code>aws …</code>.';
+    'This is a <b>functional recreation</b> of the command builder pattern. The data is a sample subset of the <b>AWS CLI v2</b> catalog. The full catalog is generated from the <b>botocore service models</b> (JSON, Apache-2.0) — this page makes no calls to AWS; it only composes the <code>aws …</code> string.';
 
   const el = h("div", { class: "detail-in" },
     h("div", { class: "crumb" }, svc.id + " ", h("b", null, cmd.name)),
     h("p", { class: "d-desc" }, cmd.desc),
     box,
-    cmd.required.length > 0 ? section("Parámetros requeridos", cmd.required, true) : null,
-    cmd.optional.length > 0 ? section("Parámetros opcionales", cmd.optional, false) : null,
+    cmd.required.length > 0 ? section("Required parameters", cmd.required, true) : null,
+    cmd.optional.length > 0 ? section("Optional parameters", cmd.optional, false) : null,
     note,
   );
   updatePreview();

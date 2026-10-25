@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AI_PROVIDERS, askAssistant } from '../lib/ai.js';
 import { readStorage, writeStorage } from '../lib/storage.js';
 
-// Ajustes guardados por proveedor (las claves se quedan solo en este navegador).
+// Settings saved per provider (keys stay only in this browser).
 export function loadSettings(provider) {
   const def = AI_PROVIDERS[provider];
   return {
@@ -38,7 +38,7 @@ export function useAssistant() {
     const text = draft.trim();
     if (busy || !text) return;
     if (config.provider !== "custom" && !config.key) {
-      push({ role: "assistant", content: "⚠️ Falta la clave API." });
+      push({ role: "assistant", content: "⚠️ Missing API key." });
       setCfgOpen(true);
       return;
     }
@@ -50,7 +50,7 @@ export function useAssistant() {
       const reply = await askAssistant(config, history);
       push({ role: "assistant", content: reply || "…" });
     } catch (e) {
-      push({ role: "assistant", content: "⚠️ Error al consultar la IA: " + ((e && e.message) ? e.message : e) });
+      push({ role: "assistant", content: "⚠️ Error querying the AI: " + ((e && e.message) ? e.message : e) });
     }
     setBusy(false);
   }

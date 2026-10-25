@@ -1,27 +1,27 @@
-// Punto de entrada: estado de la aplicación, navegación y render de los paneles.
+// Entry point: application state, navigation, and panel rendering.
 const NARROW_QUERY = "(max-width:1040px)";
 const TYPE_LABELS = { bool: "boolean", int: "integer" };
 
 const $ = id => document.getElementById(id);
 
 const state = {
-  catalog: SAMPLE_CATALOG, // arranca con la muestra y se reemplaza por catalog.json al cargar
+  catalog: SAMPLE_CATALOG, // starts with the sample and is replaced by catalog.json on load
   activeSvc: null,
   activeCmd: null,
   values: {}, // flag -> valor escrito
-  search: "", // búsqueda global
+  search: "", // global search
   svcFilter: "",
   cmdFilter: "",
   sidebarHidden: false,
   goptsOpen: false,
   globals: loadGlobals(),
-  theme: readStorage("cli-theme"), // null = según el sistema
+  theme: readStorage("cli-theme"), // null = follow the system
   assistant: { config: loadActiveSettings(), messages: [], draft: "", busy: false, cfgOpen: false },
 };
 
-let items = []; // comandos visibles según búsqueda, servicio y filtro
-let detailKey = null; // "home" o "svc/cmd" del detalle montado
-let detailStale = true; // fuerza a reconstruir el detalle (p. ej. al reiniciar valores)
+let items = []; // commands visible given the search, service and filter
+let detailKey = null; // "home" or "svc/cmd" of the mounted detail
+let detailStale = true; // forces the detail to be rebuilt (e.g. when values are reset)
 let toastTimer = 0;
 
 function isDark() {
@@ -59,7 +59,7 @@ function computeItems() {
   return list;
 }
 
-// Si el comando activo no está en la lista visible, selecciona el primero.
+// If the active command is no longer in the visible list, select the first one.
 function ensureSelection() {
   items = computeItems();
   if (!items.length) {
@@ -73,7 +73,7 @@ function ensureSelection() {
   }
 }
 
-// Aplica un cambio de estado, recalcula la selección y repinta.
+// Applies a state change, recalculates the selection, and repaints.
 function update(change) {
   change();
   ensureSelection();
@@ -106,7 +106,7 @@ function renderServices() {
   const list = state.catalog.filter(s => !term || (s.id + " " + s.name).toLowerCase().includes(term));
   $("svc-list").replaceChildren(
     ...(list.length === 0
-      ? [h("div", { class: "empty" }, "Sin servicios.")]
+      ? [h("div", { class: "empty" }, "No services.")]
       : list.map(s =>
         h("button", {
           class: "row",
@@ -120,13 +120,13 @@ function renderServices() {
   );
 }
 
-// Lista de comandos del servicio activo (o de la búsqueda global).
+// List of commands for the active service (or the global search).
 function renderCommands() {
   const list = $("cmd-list");
   if (isHome()) {
     list.replaceChildren();
   } else if (items.length === 0) {
-    list.replaceChildren(h("div", { class: "empty" }, "Sin comandos."));
+    list.replaceChildren(h("div", { class: "empty" }, "No commands."));
   } else {
     list.replaceChildren(
       ...items.map(x =>
@@ -140,7 +140,7 @@ function renderCommands() {
   }
 }
 
-// Detalle: pantalla de inicio o comando. Solo se reconstruye cuando cambia la selección o se reinician valores.
+// Detail: home screen or command. Only rebuilt when the selection changes or values are reset.
 function renderDetail() {
   const pane = $("detail-pane");
   const key = state.activeCmd ? state.activeSvc.id + "/" + state.activeCmd.name : "home";
@@ -178,7 +178,7 @@ function pickCommand({ svc, cmd }) {
   if (isNarrow()) $("detail-pane").scrollIntoView({ behavior: "smooth" });
 }
 
-// Cambiar un filtro reinicia la selección: se elige el primer comando de la nueva lista.
+// Changing a filter resets the selection: the first command of the new list is picked.
 function changeSearch(value) {
   update(() => {
     state.search = value;
@@ -213,7 +213,7 @@ function setTheme(theme) {
   render();
 }
 
-// Vista previa y estado del formulario se actualizan sin reconstruir inputs (así no se pierde el foco).
+// The preview and form state are updated without rebuilding inputs (so focus is not lost).
 function setGlobal(flag, value) {
   state.globals = { ...state.globals, [flag]: value };
   saveGlobals(state.globals);
@@ -232,14 +232,14 @@ function setGoptsOpen(open) {
   renderGlobalsPanel();
 }
 
-// Panel de opciones globales: los controles se crean una vez y luego solo se sincronizan sus valores.
+// Global options panel: controls are created once and then only their values are synced.
 let globalControls = [];
 
 function globalControl(opt) {
   const onChange = e => setGlobal(opt.flag, e.target.value);
   if (opt.type === "select") {
     return h("select", { onchange: onChange },
-      h("option", { value: "" }, "Selecciona un valor…"),
+      h("option", { value: "" }, "Select a value…"),
       opt.values.map(x => h("option", { value: x }, x)),
     );
   }
@@ -294,7 +294,7 @@ function notify(msg) {
 
 async function copy(text) {
   const ok = await copyText(text);
-  notify(ok ? "Copiado al portapapeles" : "No se pudo copiar");
+  notify(ok ? "Copied to clipboard" : "Could not copy");
 }
 
 function applyStoredTheme() {
@@ -330,7 +330,7 @@ function init() {
   ensureSelection();
   render();
 
-  // Carga el catálogo completo; si falla (sin red, file://), se conserva la muestra.
+  // Load the full catalog; if it fails (no network, file://), keep the sample.
   fetch("catalog.json")
     .then(r => {
       if (!r.ok) throw new Error("HTTP " + r.status);

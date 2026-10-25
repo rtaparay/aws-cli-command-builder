@@ -6,7 +6,7 @@ function Control({ opt, value, onChange }) {
   if (opt.type === "select") {
     return (
       <select value={value} onChange={e => onChange(opt.flag, e.target.value)}>
-        <option value="">Selecciona un valor…</option>
+        <option value="">Select a value…</option>
         {opt.values.map(x => (
           <option key={x} value={x}>{x}</option>
         ))}
@@ -33,18 +33,18 @@ function Control({ opt, value, onChange }) {
   );
 }
 
-// Panel lateral con las opciones globales de AWS CLI (se guardan en el navegador).
+// Side panel with the AWS CLI global options (saved in the browser).
 export default function GlobalOptions({ open, globals, onChange, onClear, onClose }) {
   return (
     <>
       <div className="gopts-overlay" hidden={!open} onClick={onClose} />
-      <aside className="gopts" hidden={!open} aria-label="Opciones globales">
+      <aside className="gopts" hidden={!open} aria-label="Global options">
         <div className="gopts-h">
           <div>
-            <div className="gopts-t">Opciones globales</div>
-            <div className="gopts-s">Opciones aceptadas por todo comando de AWS CLI. Se aplican a cada comando que construyes y persisten entre páginas.</div>
+            <div className="gopts-t">Global options</div>
+            <div className="gopts-s">Options accepted by every AWS CLI command. They are applied to each command you build and persist across pages.</div>
           </div>
-          <button className="gopts-x" aria-label="Cerrar" onClick={onClose}>✕</button>
+          <button className="gopts-x" aria-label="Close" onClick={onClose}>✕</button>
         </div>
         <div className="gopts-b">
           {GLOBAL_OPTS.map(o => {
@@ -62,8 +62,8 @@ export default function GlobalOptions({ open, globals, onChange, onClear, onClos
           })}
         </div>
         <div className="gopts-foot">
-          <span>Guardado en este dispositivo.</span>
-          <button className="gopts-clear" onClick={onClear}>Limpiar todo</button>
+          <span>Saved on this device.</span>
+          <button className="gopts-clear" onClick={onClear}>Clear all</button>
         </div>
       </aside>
     </>

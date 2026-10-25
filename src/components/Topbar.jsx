@@ -16,20 +16,20 @@ export default function Topbar({ search, onSearch, dark, onToggleTheme, onToggle
         </div>
       </div>
       <span className="divider" />
-      <button className="icon-btn" title="Ocultar / mostrar menú" onClick={onToggleSidebar}>
+      <button className="icon-btn" title="Hide / show menu" onClick={onToggleSidebar}>
         <SidebarIcon />
       </button>
-      <button className="icon-btn" title="Inicio" onClick={onHome}>
+      <button className="icon-btn" title="Home" onClick={onHome}>
         <HomeIcon />
       </button>
-      <button className="icon-btn" title="Opciones globales" onClick={onOpenGlobals}>
+      <button className="icon-btn" title="Global options" onClick={onOpenGlobals}>
         <GearIcon />
       </button>
       <div className="topsearch">
         <SearchIcon />
         <input
           type="search"
-          placeholder="Buscar comandos…"
+          placeholder="Search commands…"
           autoComplete="off"
           spellCheck={false}
           value={search}
@@ -37,7 +37,7 @@ export default function Topbar({ search, onSearch, dark, onToggleTheme, onToggle
         />
       </div>
       <span className="spacer" />
-      <button className="icon-btn" title="Cambiar tema" onClick={onToggleTheme}>
+      <button className="icon-btn" title="Toggle theme" onClick={onToggleTheme}>
         {dark ? <SunIcon /> : <MoonIcon />}
       </button>
     </header>

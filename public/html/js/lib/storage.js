@@ -1,4 +1,4 @@
-// Lectura y escritura tolerante a fallos de localStorage (modo privado, cuota, acceso bloqueado).
+// Fault-tolerant localStorage read and write (private mode, quota, blocked access).
 
 function readStorage(key, fallback = null) {
   try {
@@ -13,6 +13,6 @@ function writeStorage(key, value) {
   try {
     localStorage.setItem(key, value);
   } catch (e) {
-    // Sin almacenamiento disponible: la sesión sigue funcionando sin persistir.
+    // No storage available: the session keeps working without persisting.
   }
 }

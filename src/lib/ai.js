@@ -2,10 +2,10 @@ export const AI_PROVIDERS = {
   gemini: { label: "Gemini (Google)", model: "gemini-2.0-flash", base: "", needsBase: false },
   claude: { label: "Claude (Anthropic)", model: "claude-3-5-haiku-latest", base: "", needsBase: false },
   openai: { label: "OpenAI", model: "gpt-4o-mini", base: "", needsBase: false },
-  custom: { label: "Personalizada / IA local", model: "", base: "http://localhost:11434/v1", needsBase: true },
+  custom: { label: "Custom / Local AI", model: "", base: "http://localhost:11434/v1", needsBase: true },
 };
 
-const SYSTEM_PROMPT = "Eres un asistente que SOLO genera comandos de AWS CLI v2. Dada la necesidad del usuario, responde con el o los comandos 'aws ...' correctos (servicio, operacion y flags). Devuelve cada comando en su propio bloque de codigo con triple backtick y una breve explicacion de una linea. Usa marcadores como <value> donde falten datos. No inventes flags que no existan. Si el usuario pide cualquier cosa que no sea un comando de AWS CLI (escribir codigo, texto general, usar otra herramienta, etc.), rechazalo brevemente e indica que solo generas comandos de AWS CLI. No ejecutas comandos ni accedes a ninguna cuenta. Responde en el idioma del usuario.";
+const SYSTEM_PROMPT = "You are an assistant that ONLY generates AWS CLI v2 commands. Given the user's need, reply with the correct 'aws ...' command or commands (service, operation and flags). Return each command in its own code block with triple backticks and a brief one-line explanation. Use placeholders such as <value> where data is missing. Do not invent flags that do not exist. If the user asks for anything that is not an AWS CLI command (writing code, general text, using another tool, etc.), decline briefly and state that you only generate AWS CLI commands. You do not run commands or access any account. Reply in the user's language.";
 
 async function checkedJson(response) {
   if (!response.ok) {

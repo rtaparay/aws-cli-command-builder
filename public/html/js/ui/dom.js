@@ -1,4 +1,4 @@
-// Crea un elemento con atributos, eventos (onclick, oninput…) y hijos (texto, nodos o arrays).
+// Creates an element with attributes, events (onclick, oninput…) and children (text, nodes or arrays).
 function h(tag, props, ...children) {
   const el = document.createElement(tag);
   Object.entries(props || {}).forEach(([key, val]) => {
@@ -18,7 +18,7 @@ function h(tag, props, ...children) {
   return el;
 }
 
-// Texto con saltos de línea convertidos en <br>.
+// Text with line breaks converted to <br>.
 function lines(text) {
   const all = String(text).split("\n");
   return all.flatMap((line, i) => (i < all.length - 1 ? [line, h("br")] : [line]));

@@ -1,4 +1,4 @@
-// Ajustes guardados por proveedor (las claves se quedan solo en este navegador).
+// Settings saved per provider (keys stay only in this browser).
 function loadSettings(provider) {
   const def = AI_PROVIDERS[provider];
   return {

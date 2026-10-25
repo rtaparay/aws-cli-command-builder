@@ -14,18 +14,18 @@ import { readStorage, writeStorage } from './lib/storage.js';
 const NARROW_QUERY = '(max-width:1040px)';
 
 export default function App() {
-  // Catálogo: arranca con la muestra incluida y se reemplaza por catalog.json al cargar.
+  // Catalog: starts with the bundled sample and is replaced by catalog.json on load.
   const [catalog, setCatalog] = useState(SAMPLE_CATALOG);
   const [activeSvc, setActiveSvc] = useState(null);
   const [activeCmd, setActiveCmd] = useState(null);
   const [values, setValues] = useState({}); // flag -> valor escrito
-  const [search, setSearch] = useState(''); // búsqueda global
+  const [search, setSearch] = useState(''); // global search
   const [svcFilter, setSvcFilter] = useState('');
   const [cmdFilter, setCmdFilter] = useState('');
   const [sidebarHidden, setSidebarHidden] = useState(false);
   const [goptsOpen, setGoptsOpen] = useState(false);
   const [globals, setGlobals] = useState(loadGlobals);
-  const [theme, setTheme] = useState(() => readStorage('cli-theme')); // null = según el sistema
+  const [theme, setTheme] = useState(() => readStorage('cli-theme')); // null = follow the system
   const [toast, setToast] = useState({ msg: '', show: false });
   const toastTimer = useRef(0);
   const cmdsRef = useRef(null);
@@ -51,7 +51,7 @@ export default function App() {
     return list;
   }, [allCommands, activeSvc, search, cmdFilter]);
 
-  // Si el comando activo no está en la lista visible, selecciona el primero.
+  // If the active command is no longer in the visible list, select the first one.
   useEffect(() => {
     if (!items.length) {
       if (activeCmd) setActiveCmd(null);
@@ -64,7 +64,7 @@ export default function App() {
     }
   }, [items]);
 
-  // Carga el catálogo completo; si falla (sin red, file://), se conserva la muestra.
+  // Load the full catalog; if it fails (no network, file://), keep the sample.
   useEffect(() => {
     let cancelled = false;
     fetch(import.meta.env.BASE_URL + 'catalog.json')
@@ -109,7 +109,7 @@ export default function App() {
 
   async function copy(text) {
     const ok = await copyText(text);
-    notify(ok ? 'Copiado al portapapeles' : 'No se pudo copiar');
+    notify(ok ? 'Copied to clipboard' : 'Could not copy');
   }
 
   const isNarrow = () => window.matchMedia(NARROW_QUERY).matches;
@@ -130,7 +130,7 @@ export default function App() {
     if (isNarrow()) detailRef.current?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  // Cambiar un filtro reinicia la selección: se elige el primer comando de la nueva lista.
+  // Changing a filter resets the selection: the first command of the new list is picked.
   function changeSearch(value) {
     setSearch(value);
     setActiveCmd(null);
