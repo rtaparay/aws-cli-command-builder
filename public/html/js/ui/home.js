@@ -15,7 +15,7 @@ function buildHome(catalog) {
     h("div", { class: "hero" },
       h("span", { class: "eyebrow" }, ">_ Catálogo AWS CLI v2 · botocore"),
       h("h2", null, "Create AWS CLI commands step by step"),
-      h("p", null, "Explora los servicios, elige un comando y complétalo parámetro por parámetro. La vista previa se arma sola, lista para copiar al terminal."),
+      h("p", null, "Explore the services, choose a command, and complete it parameter by parameter. The preview will automatically assemble, ready to be copied to the terminal."),
     ),
     h("div", { class: "stats" },
       statCard("service", "Servicios", catalog.length, "servicios AWS"),
