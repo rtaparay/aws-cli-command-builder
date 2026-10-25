@@ -1,21 +1,22 @@
-# Documentación — CLI Command Builder
+# Documentation — CLI Command Builder
 
-Índice de la documentación técnica del proyecto. Para una visión general (qué es, funcionalidades, uso), ver el [README.md](../README.md) de la raíz.
+Index of the technical documentation for the project. For an overview (what it is, features, usage), see the root [README.md](../README.md).
 
-| Documento | Contenido |
+| Document | Contents |
 |---|---|
-| [arquitectura.md](arquitectura.md) | Estructura del código, flujo de datos, estado, catálogo y asistente de IA. |
-| [despliegue-vercel.md](despliegue-vercel.md) | Publicación como sitio estático en Vercel. |
-| [despliegue-docker-local.md](despliegue-docker-local.md) | Construcción y ejecución de la imagen Docker en tu máquina. |
-| [despliegue-aws-ec2-docker.md](despliegue-aws-ec2-docker.md) | Despliegue en una instancia EC2 con Docker. |
+| [architecture.md](architecture.md) | Code structure, data flow, state, catalog, and AI assistant. |
+| [deployment-vercel.md](deployment-vercel.md) | Publishing as a static site on Vercel (dashboard, Git integration, domains). |
+| [deployment-vercel-cli.md](deployment-vercel-cli.md) | Deploying from the terminal with the Vercel CLI. |
+| [deployment-docker-local.md](deployment-docker-local.md) | Building and running the Docker image on your machine. |
+| [deployment-aws-ec2-docker.md](deployment-aws-ec2-docker.md) | Deploying to an EC2 instance with Docker. |
 
-## Resumen de despliegue
+## Deployment summary
 
-| Objetivo | Documento | Qué necesitas |
+| Goal | Document | What you need |
 |---|---|---|
-| Ver la app en desarrollo | README raíz, sección 3 | Node 26, `npm run dev` |
-| Publicar en la web pública sin mantener servidores | [despliegue-vercel.md](despliegue-vercel.md) | Cuenta de Vercel y repositorio conectado |
-| Probar el contenedor en tu PC | [despliegue-docker-local.md](despliegue-docker-local.md) | Docker |
-| Publicar en tu propio servidor AWS | [despliegue-aws-ec2-docker.md](despliegue-aws-ec2-docker.md) | Cuenta AWS, instancia EC2, Docker |
+| Run the app in development | Root README, section 3 | Node 26, `npm run dev` |
+| Publish to the public web without maintaining servers | [deployment-vercel.md](deployment-vercel.md) | Vercel account and a connected repository |
+| Test the container on your PC | [deployment-docker-local.md](deployment-docker-local.md) | Docker |
+| Publish on your own AWS server | [deployment-aws-ec2-docker.md](deployment-aws-ec2-docker.md) | AWS account, EC2 instance, Docker |
 
-> **Nota:** la app es un sitio **100 % estático**. No tiene backend, base de datos ni variables de entorno obligatorias, y no necesita credenciales de AWS para funcionar. Cualquier hosting de archivos estáticos sirve.
+> **Note:** the app is a **100% static** site. It has no backend, no database, and no required environment variables, and it does not need AWS credentials to work. Any static file hosting can serve it.
