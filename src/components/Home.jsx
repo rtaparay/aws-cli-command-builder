@@ -23,7 +23,7 @@ export default function Home({ catalog, assistant, onCopy }) {
     <div className="detail-in">
       <div className="hero">
         <span className="eyebrow">&gt;_ Catálogo AWS CLI v2 · botocore</span>
-        <h2>Compón comandos de CLI sin salir de los docs.</h2>
+        <h2>Create AWS CLI commands step by step</h2>
         <p>Explora los servicios, elige un comando y complétalo parámetro por parámetro. La vista previa se arma sola, lista para copiar al terminal.</p>
       </div>
       <div className="stats">

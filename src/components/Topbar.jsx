@@ -12,7 +12,7 @@ export default function Topbar({ search, onSearch, dark, onToggleTheme, onToggle
         </span>
         <div style={{ minWidth: 0 }}>
           <h1>CLI <b>Command</b> Builder</h1>
-          <div className="sub">compón comandos sin salir de los docs</div>
+          <div className="sub">Create AWS CLI commands step by step</div>
         </div>
       </div>
       <span className="divider" />
