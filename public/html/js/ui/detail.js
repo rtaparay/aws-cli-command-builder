@@ -5,7 +5,7 @@ let detailRefs = null;
 function previewBody(svc, cmd, parts) {
   const rows = [
     h("span", null,
-      h("span", { class: "k" }, CLI), " ",
+      h("span", { class: "k" }, cliFor(svc)), " ",
       h("span", { class: "svc" }, svc.id), " ",
       h("span", { class: "cmd" }, cmd.name),
       parts.length > 0 ? h("span", { class: "cont" }, " \\") : null,
@@ -40,7 +40,7 @@ function updatePreview() {
       ),
     );
   }
-  box.append(previewBody(svc, cmd, commandParts(cmd, values, globals)));
+  box.append(previewBody(svc, cmd, commandParts(svc, cmd, values, globals)));
 }
 
 function paramField(p, required) {
@@ -92,11 +92,19 @@ function buildCommandDetail(svc, cmd) {
   );
   detailRefs = { box };
 
+  const cloud = CLOUDS[svc.cloud];
   const note = h("div", { class: "note" });
-  note.innerHTML =
-    'This is a <b>functional recreation</b> of the command builder pattern. The data is a sample subset of the <b>AWS CLI v2</b> catalog. The full catalog is generated from the <b>botocore service models</b> (JSON, Apache-2.0) — this page makes no calls to AWS; it only composes the <code>aws …</code> string.';
+  note.innerHTML = svc.cloud === "azure"
+    ? 'Functional recreation of the command builder pattern for the <b>Azure CLI</b>. The full catalog is generated from the <b>azure-cli command modules</b> (MIT) — this page makes no calls to Azure; it only composes the <code>az …</code> string.'
+    : 'This is a <b>functional recreation</b> of the command builder pattern. The data is a sample subset of the <b>AWS CLI v2</b> catalog. The full catalog is generated from the <b>botocore service models</b> (JSON, Apache-2.0) — this page makes no calls to AWS; it only composes the <code>aws …</code> string.';
 
   const el = h("div", { class: "detail-in" },
+    h("div", { class: "crumb-cloud" },
+      cloudMark(svc.cloud, "xs"),
+      h("span", null, cloud.name),
+      h("span", { class: "sep" }, "/"),
+      h("span", null, (svc.name || svc.id).replace(/\.$/, "")),
+    ),
     h("div", { class: "crumb" }, svc.id + " ", h("b", null, cmd.name)),
     h("p", { class: "d-desc" }, cmd.desc),
     box,

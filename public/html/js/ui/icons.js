@@ -11,6 +11,7 @@ const ICON_PATHS = {
   cmd: '<path d="M5 7l4 5-4 5" /><path d="M13 17h6" />',
   service: '<circle cx="7" cy="7" r="3" /><circle cx="17" cy="7" r="3" /><circle cx="12" cy="17" r="3" />',
   flag: '<path d="M4 21V4h12l-2 4 2 4H4" />',
+  layers: '<path d="M12 3 2 8l10 5 10-5-10-5z" /><path d="m2 13 10 5 10-5" />',
   source: '<path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0" /><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />',
 };
 

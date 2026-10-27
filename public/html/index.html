@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width,initial-scale=1,viewport-fit=cover"
     />
-    <meta name="catalog" content="AWS CLI v2 — botocore service models" />
+    <meta name="catalog" content="AWS CLI v2 (botocore) + Azure CLI (azure-cli command modules)" />
     <title>CLI Command Builder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,7 +34,7 @@
         </span>
         <div style="min-width: 0">
           <h1>CLI <b>Command</b> Builder</h1>
-          <div class="sub">Create AWS CLI commands step by step</div>
+          <div class="sub">AWS + Azure CLI · step by step</div>
         </div>
       </div>
       <span class="divider"></span>
@@ -73,6 +73,7 @@
     <div class="shell" id="shell">
       <aside class="pane svc">
         <div class="pane-h">
+          <nav class="cloud-nav" id="cloud-nav" aria-label="Clouds"></nav>
           <div class="filt">
             <span data-icon="search"></span>
             <input
@@ -109,10 +110,8 @@
       <div class="gopts-h">
         <div>
           <div class="gopts-t">Global options</div>
-          <div class="gopts-s">
-            Options accepted by every AWS CLI command. They are applied to each
-            command you build and persist across pages.
-          </div>
+          <div class="gopts-s" id="gopts-sub"></div>
+          <div class="seg gopts-tabs" id="gopts-tabs" role="group" aria-label="CLI"></div>
         </div>
         <button class="gopts-x" id="gopts-close" aria-label="Close">✕</button>
       </div>
@@ -126,9 +125,11 @@
     <div class="toast" id="toast"></div>
 
     <!-- Order matters: each file uses the functions and constants of the ones before it. -->
-    <script src="js/data/sampleCatalog.js"></script>
+    <script src="js/data/awsSampleCatalog.js"></script>
+    <script src="js/data/azureSampleCatalog.js"></script>
     <script src="js/lib/storage.js"></script>
     <script src="js/lib/clipboard.js"></script>
+    <script src="js/lib/clouds.js"></script>
     <script src="js/lib/globalOptions.js"></script>
     <script src="js/lib/ai.js"></script>
     <script src="js/lib/settings.js"></script>

@@ -102,7 +102,6 @@ function buildAssistantCard() {
   const cfgSlot = h("div");
   const textarea = h("textarea", {
     rows: "2",
-    placeholder: "Describe what you want to do in AWS… (e.g. list S3 buckets)",
     value: state.assistant.draft,
     oninput: e => (state.assistant.draft = e.target.value),
     onkeydown: e => {
@@ -113,19 +112,21 @@ function buildAssistantCard() {
     },
   });
   const send = h("button", { class: "ai-send", onclick: sendMessage }, "Send");
+  const title = h("div", { class: "ai-h1" });
+  const sub = h("div", { class: "ai-h2" });
+  const foot = h("div", { class: "ai-foot" });
+  const seg = h("div", { class: "seg", role: "group", "aria-label": "Target CLI" });
 
-  assistantView = { prov, transcript, cfgSlot, textarea, send };
+  assistantView = { prov, transcript, cfgSlot, textarea, send, title, sub, foot, seg };
 
   const card = h("div", { class: "ai-card" },
     h("div", { class: "ai-head" },
       h("div", { class: "ai-title" },
         h("span", { class: "ai-badge" }, "AI"),
-        h("div", { style: { minWidth: "0" } },
-          h("div", { class: "ai-h1" }, "AI Assistant — AWS CLI Commands"),
-          h("div", { class: "ai-h2" }, "Describe what you want to do in AWS and the AI will give you the command."),
-        ),
+        h("div", { style: { minWidth: "0" } }, title, sub),
       ),
       h("div", { class: "ai-head-acts" },
+        seg,
         prov,
         h("button", { class: "ai-mini", onclick: clearChat }, "Clear chat"),
         h("button", { class: "ai-mini", onclick: toggleCfg }, "Settings"),
@@ -134,7 +135,7 @@ function buildAssistantCard() {
     cfgSlot,
     transcript,
     h("div", { class: "ai-input" }, textarea, send),
-    h("div", { class: "ai-foot" }, "Only generates AWS CLI v2 commands. Review each command before running it."),
+    foot,
   );
 
   renderConfigSlot();
@@ -175,8 +176,32 @@ function renderAssistant() {
   const a = state.assistant;
   assistantView.prov.textContent = AI_PROVIDERS[a.config.provider].label;
   assistantView.send.disabled = a.busy;
+  const c = CLOUDS[a.cloud];
+  assistantView.title.textContent = "AI Assistant — " + c.short + " CLI Commands";
+  assistantView.sub.textContent = "Describe what you want to do in " + c.short + " and the AI will give you the " + c.cli + " command.";
+  assistantView.foot.textContent = "Only generates " + c.cliName + " commands. Review each command before running it.";
+  assistantView.textarea.placeholder = "Describe what you want to do in " + c.short + "… (e.g. " + c.searchHint + ")";
+  assistantView.seg.replaceChildren(
+    ...CLOUD_IDS.map(id =>
+      h("button", {
+        class: "seg-btn " + id,
+        "aria-pressed": String(id === a.cloud),
+        title: "Generate " + CLOUDS[id].cliName + " commands",
+        onclick: () => setAssistantCloud(id),
+      }, cloudMark(id, "xs"), CLOUDS[id].short),
+    ),
+  );
   if (assistantView.textarea.value !== a.draft) assistantView.textarea.value = a.draft;
   renderTranscript();
+}
+
+// Switching the target CLI starts a new conversation (the prompt is different).
+function setAssistantCloud(cloud) {
+  const a = state.assistant;
+  if (a.cloud === cloud) return;
+  a.cloud = cloud;
+  a.messages = [];
+  renderAssistant();
 }
 
 function clearChat() {
@@ -213,7 +238,7 @@ async function sendMessage() {
   a.busy = true;
   renderAssistant();
   try {
-    const reply = await askAssistant(a.config, a.messages);
+    const reply = await askAssistant(a.config, a.messages, a.cloud);
     a.messages.push({ role: "assistant", content: reply || "…" });
   } catch (e) {
     a.messages.push({ role: "assistant", content: "⚠️ Error querying the AI: " + ((e && e.message) ? e.message : e) });

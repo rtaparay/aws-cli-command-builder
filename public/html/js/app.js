@@ -1,11 +1,27 @@
 // Entry point: application state, navigation, and panel rendering.
 const NARROW_QUERY = "(max-width:1040px)";
 const TYPE_LABELS = { bool: "boolean", int: "integer" };
+const CLOUD_FILTERS = ["all", ...CLOUD_IDS];
 
 const $ = id => document.getElementById(id);
 
+// Each service is tagged with its cloud so the rest of the app knows which CLI to use.
+function tagCloud(services, cloud) {
+  return services.map(s => (s.cloud === cloud ? s : { ...s, cloud }));
+}
+
+function storedCloud() {
+  const v = readStorage("cli-cloud", "all");
+  return CLOUD_FILTERS.includes(v) ? v : "all";
+}
+
 const state = {
-  catalog: SAMPLE_CATALOG, // starts with the sample and is replaced by catalog.json on load
+  catalogs: { // start with the samples and are replaced by catalog.json / azure-catalog.json on load
+    aws: tagCloud(SAMPLE_CATALOG, "aws"),
+    azure: tagCloud(AZURE_SAMPLE_CATALOG, "azure"),
+  },
+  sources: { aws: "sample", azure: "sample" }, // generated_from of the loaded catalog
+  cloud: storedCloud(), // "all" | "aws" | "azure": filter of the left menu
   activeSvc: null,
   activeCmd: null,
   values: {}, // flag -> valor escrito
@@ -14,15 +30,33 @@ const state = {
   cmdFilter: "",
   sidebarHidden: false,
   goptsOpen: false,
-  globals: loadGlobals(),
+  goptsCloud: "aws",
+  globals: loadGlobals(), // { aws: {...}, azure: {...} }
   theme: readStorage("cli-theme"), // null = follow the system
-  assistant: { config: loadActiveSettings(), messages: [], draft: "", busy: false, cfgOpen: false },
+  assistant: { config: loadActiveSettings(), messages: [], draft: "", busy: false, cfgOpen: false, cloud: "aws" },
 };
+if (state.cloud !== "all") state.assistant.cloud = state.cloud;
 
 let items = []; // commands visible given the search, service and filter
-let detailKey = null; // "home" or "svc/cmd" of the mounted detail
+let detailKey = null; // "home:<cloud>" or "cloud/svc/cmd" of the mounted detail
 let detailStale = true; // forces the detail to be rebuilt (e.g. when values are reset)
 let toastTimer = 0;
+
+// Services visible with the current cloud filter.
+function visibleCatalog() {
+  return state.cloud === "all" ? CLOUD_IDS.flatMap(c => state.catalogs[c]) : state.catalogs[state.cloud];
+}
+
+// The cloud that gives context to the screen (accent color, global options, AI prompt).
+function contextCloud() {
+  if (state.activeSvc) return state.activeSvc.cloud;
+  return state.cloud === "all" ? "aws" : state.cloud;
+}
+
+function cloudTotals(cloud) {
+  const list = state.catalogs[cloud];
+  return { services: list.length, commands: list.reduce((a, s) => a + s.commands.length, 0) };
+}
 
 function isDark() {
   return state.theme ? state.theme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -42,13 +76,13 @@ function resetValues() {
 }
 
 function computeItems() {
-  const { catalog, activeSvc, search, cmdFilter } = state;
+  const { activeSvc, search, cmdFilter } = state;
   const gt = search.trim().toLowerCase();
   let list;
   if (gt) {
-    list = catalog
+    list = visibleCatalog()
       .flatMap(s => s.commands.map(c => ({ svc: s, cmd: c })))
-      .filter(x => (x.svc.id + " " + x.cmd.name + " " + x.cmd.desc).toLowerCase().includes(gt));
+      .filter(x => (CLOUDS[x.svc.cloud].cli + " " + x.svc.id + " " + x.cmd.name + " " + x.cmd.desc).toLowerCase().includes(gt));
   } else if (activeSvc) {
     list = activeSvc.commands.map(c => ({ svc: activeSvc, cmd: c }));
   } else {
@@ -82,10 +116,15 @@ function update(change) {
 
 function render() {
   $("shell").className = "shell" + (isHome() ? " home" : "") + (state.sidebarHidden ? " hide-svc" : "");
+  document.documentElement.setAttribute("data-cloud", contextCloud());
   setInput($("search"), state.search);
   setInput($("svc-filter"), state.svcFilter);
   setInput($("cmd-filter"), state.cmdFilter);
+  $("search").placeholder = state.cloud === "all"
+    ? "Search AWS and Azure commands…"
+    : "Search " + CLOUDS[state.cloud].short + " commands…";
   renderTheme();
+  renderCloudNav();
   renderServices();
   renderCommands();
   renderDetail();
@@ -101,28 +140,86 @@ function renderTheme() {
   $("btn-theme").replaceChildren(icon(dark ? "sun" : "moon"));
 }
 
+// Cloud menu at the top of the left pane: "All", AWS and Azure with their totals.
+function renderCloudNav() {
+  const totalSvcs = CLOUD_IDS.reduce((a, c) => a + state.catalogs[c].length, 0);
+  const rows = CLOUD_FILTERS.map(f => {
+    const isAll = f === "all";
+    const t = isAll ? null : cloudTotals(f);
+    return h("button", {
+      class: "cloud-row" + (isAll ? " all" : " " + f),
+      "aria-current": String(state.cloud === f),
+      title: isAll ? "All clouds" : CLOUDS[f].name,
+      onclick: () => pickCloud(f),
+    },
+      isAll ? h("span", { class: "cloud-mark all", "aria-hidden": "true" }, icon("layers")) : cloudMark(f),
+      h("span", { class: "cloud-txt" },
+        h("span", { class: "cloud-name" }, isAll ? "All clouds" : CLOUDS[f].short + " commands"),
+        h("span", { class: "cloud-sub" }, isAll
+          ? CLOUD_IDS.map(c => CLOUDS[c].short).join(" + ")
+          : t.commands.toLocaleString() + " commands"),
+      ),
+      h("span", { class: "count" }, (isAll ? totalSvcs : t.services).toLocaleString()),
+    );
+  });
+  const soonRows = SOON_CLOUD_IDS.map(id =>
+    h("button", {
+      class: "cloud-row soon " + id,
+      title: CLOUDS[id].name + " — " + SOON_MESSAGE,
+      onclick: e => showComingSoon(id, e.currentTarget),
+    },
+      cloudMark(id),
+      h("span", { class: "cloud-txt" },
+        h("span", { class: "cloud-name" }, CLOUDS[id].short + " commands"),
+        h("span", { class: "cloud-sub soon-sub" }, CLOUDS[id].cliName),
+        h("span", { class: "cloud-sub soon-note", role: "status" }, SOON_MESSAGE),
+      ),
+      h("span", { class: "soon-badge" }, "Pronto"),
+    ),
+  );
+  $("cloud-nav").replaceChildren(
+    h("div", { class: "ph-title" }, "Clouds"), ...rows,
+    h("div", { class: "ph-title soon-title" }, "Próximamente"), ...soonRows,
+  );
+}
+
+function serviceRow(s) {
+  return h("button", {
+    class: "row",
+    "aria-current": String(state.activeSvc === s),
+    title: s.name,
+    onclick: () => pickService(s),
+  },
+    h("span", { class: "svc-dot " + s.cloud, "aria-hidden": "true" }),
+    h("span", { style: { flex: "1", minWidth: "0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, s.id),
+    h("span", { class: "count" }, String(s.commands.length)),
+  );
+}
+
+// Services grouped by cloud, each group with its header and total.
 function renderServices() {
   const term = state.svcFilter.trim().toLowerCase();
-  const list = state.catalog.filter(s => !term || (s.id + " " + s.name).toLowerCase().includes(term));
-  $("svc-list").replaceChildren(
-    ...(list.length === 0
-      ? [h("div", { class: "empty" }, "No services.")]
-      : list.map(s =>
-        h("button", {
-          class: "row",
-          "aria-current": String(state.activeSvc?.id === s.id),
-          onclick: () => pickService(s),
-        },
-          h("span", { style: { flex: "1", minWidth: "0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" } }, s.id),
-          h("span", { class: "count" }, String(s.commands.length)),
-        ),
-      )),
-  );
+  const clouds = state.cloud === "all" ? CLOUD_IDS : [state.cloud];
+  const nodes = [];
+  clouds.forEach(c => {
+    const list = state.catalogs[c].filter(s => !term || (s.id + " " + s.name).toLowerCase().includes(term));
+    if (!list.length) return;
+    nodes.push(
+      h("div", { class: "svc-group-h " + c },
+        cloudMark(c, "xs"),
+        h("span", null, CLOUDS[c].short + " services"),
+        h("span", { class: "n" }, term ? list.length + " / " + state.catalogs[c].length : String(list.length)),
+      ),
+      ...list.map(serviceRow),
+    );
+  });
+  $("svc-list").replaceChildren(...(nodes.length ? nodes : [h("div", { class: "empty" }, "No services.")]));
 }
 
 // List of commands for the active service (or the global search).
 function renderCommands() {
   const list = $("cmd-list");
+  const searching = !!state.search.trim();
   if (isHome()) {
     list.replaceChildren();
   } else if (items.length === 0) {
@@ -134,7 +231,10 @@ function renderCommands() {
           class: "cmd",
           "aria-current": String(x.cmd === state.activeCmd),
           onclick: () => pickCommand(x),
-        }, x.cmd.name),
+        },
+          searching ? h("span", { class: "cmd-svc " + x.svc.cloud }, CLOUDS[x.svc.cloud].cli + " " + x.svc.id) : null,
+          x.cmd.name,
+        ),
       ),
     );
   }
@@ -143,7 +243,9 @@ function renderCommands() {
 // Detail: home screen or command. Only rebuilt when the selection changes or values are reset.
 function renderDetail() {
   const pane = $("detail-pane");
-  const key = state.activeCmd ? state.activeSvc.id + "/" + state.activeCmd.name : "home";
+  const key = state.activeCmd
+    ? state.activeSvc.cloud + "/" + state.activeSvc.id + "/" + state.activeCmd.name
+    : "home:" + state.cloud;
   if (detailStale || key !== detailKey) {
     detailKey = key;
     detailStale = false;
@@ -151,11 +253,28 @@ function renderDetail() {
       pane.replaceChildren(buildCommandDetail(state.activeSvc, state.activeCmd));
     } else {
       assistantView = null;
-      pane.replaceChildren(buildHome(state.catalog));
+      pane.replaceChildren(buildHome(state.cloud));
     }
   } else if (state.activeCmd) {
     updatePreview();
   }
+}
+
+// Selecting a cloud filters the menu and takes you to that cloud's home with its services.
+function pickCloud(cloud) {
+  writeStorage("cli-cloud", cloud);
+  update(() => {
+    state.cloud = cloud;
+    if (cloud !== "all") state.assistant.cloud = cloud;
+    state.activeSvc = null;
+    state.activeCmd = null;
+    resetValues();
+    state.search = "";
+    state.cmdFilter = "";
+    state.svcFilter = "";
+  });
+  $("svc-list").scrollTop = 0;
+  if (isNarrow()) $("detail-pane").scrollIntoView({ behavior: "smooth" });
 }
 
 function pickService(svc) {
@@ -215,24 +334,35 @@ function setTheme(theme) {
 
 // The preview and form state are updated without rebuilding inputs (so focus is not lost).
 function setGlobal(flag, value) {
-  state.globals = { ...state.globals, [flag]: value };
-  saveGlobals(state.globals);
+  const c = state.goptsCloud;
+  state.globals = { ...state.globals, [c]: { ...state.globals[c], [flag]: value } };
+  saveGlobals(c, state.globals[c]);
   updatePreview();
 }
 
 function clearGlobals() {
-  state.globals = {};
-  saveGlobals(state.globals);
+  const c = state.goptsCloud;
+  state.globals = { ...state.globals, [c]: {} };
+  saveGlobals(c, {});
   renderGlobalsPanel();
   updatePreview();
 }
 
 function setGoptsOpen(open) {
   state.goptsOpen = open;
+  if (open) setGoptsCloud(contextCloud());
   renderGlobalsPanel();
 }
 
-// Global options panel: controls are created once and then only their values are synced.
+function setGoptsCloud(cloud) {
+  if (state.goptsCloud !== cloud || !globalControls.length) {
+    state.goptsCloud = cloud;
+    buildGlobalsPanel();
+  }
+  renderGlobalsPanel();
+}
+
+// Global options panel: controls are created once per cloud and then only their values are synced.
 let globalControls = [];
 
 function globalControl(opt) {
@@ -259,7 +389,18 @@ function globalControl(opt) {
 }
 
 function buildGlobalsPanel() {
-  globalControls = GLOBAL_OPTS.map(opt => ({ opt, el: globalControl(opt) }));
+  const cloud = state.goptsCloud;
+  globalControls = GLOBAL_OPTS_BY_CLOUD[cloud].map(opt => ({ opt, el: globalControl(opt) }));
+  $("gopts-tabs").replaceChildren(
+    ...CLOUD_IDS.map(c =>
+      h("button", { class: "seg-btn " + c, "aria-pressed": String(c === cloud), onclick: () => setGoptsCloud(c) },
+        cloudMark(c, "xs"), CLOUDS[c].cliName,
+      ),
+    ),
+  );
+  $("gopts-sub").textContent =
+    "Options accepted by every " + CLOUDS[cloud].cliName + " command (" + CLOUDS[cloud].cli +
+    " …). They are applied to each command you build and persist across pages.";
   $("gopts-body").replaceChildren(
     ...globalControls.map(({ opt, el }) =>
       h("div", { class: "gopt" },
@@ -277,8 +418,10 @@ function buildGlobalsPanel() {
 function renderGlobalsPanel() {
   $("gopts-overlay").hidden = !state.goptsOpen;
   $("gopts").hidden = !state.goptsOpen;
+  $("gopts").setAttribute("data-cloud", state.goptsCloud);
+  const values = state.globals[state.goptsCloud] || {};
   globalControls.forEach(({ opt, el }) => {
-    const raw = state.globals[opt.flag];
+    const raw = values[opt.flag];
     const value = opt.type === "bool" ? (raw ? "1" : "") : raw != null ? String(raw) : "";
     setInput(el, value);
   });
@@ -301,6 +444,30 @@ function applyStoredTheme() {
   if (state.theme) document.documentElement.setAttribute("data-theme", state.theme);
 }
 
+// Loads one cloud's full catalog; if it fails (no network, file://, file missing), keeps the sample.
+function loadCatalog(cloud) {
+  fetch(CLOUDS[cloud].catalogUrl)
+    .then(r => {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(d => {
+      if (!d || !Array.isArray(d.services) || !d.services.length) return;
+      update(() => {
+        state.catalogs = { ...state.catalogs, [cloud]: tagCloud(d.services, cloud) };
+        state.sources = { ...state.sources, [cloud]: d.generated_from || "catalog" };
+        // Only the selection that belonged to this cloud is invalidated.
+        if (!state.activeSvc || state.activeSvc.cloud === cloud) {
+          state.activeSvc = null;
+          state.activeCmd = null;
+          resetValues();
+        }
+        detailStale = true;
+      });
+    })
+    .catch(() => { });
+}
+
 function init() {
   document.querySelectorAll("[data-icon]").forEach(el => {
     const svg = icon(el.dataset.icon);
@@ -308,6 +475,7 @@ function init() {
     else el.replaceWith(svg);
   });
   applyStoredTheme();
+  state.goptsCloud = contextCloud();
   buildGlobalsPanel();
 
   $("btn-sidebar").addEventListener("click", () => {
@@ -326,29 +494,14 @@ function init() {
   $("gopts-overlay").addEventListener("click", () => setGoptsOpen(false));
   $("gopts-close").addEventListener("click", () => setGoptsOpen(false));
   $("gopts-clear").addEventListener("click", clearGlobals);
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && state.goptsOpen) setGoptsOpen(false);
+  });
 
   ensureSelection();
   render();
 
-  // Load the full catalog; if it fails (no network, file://), keep the sample.
-  fetch("catalog.json")
-    .then(r => {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return r.json();
-    })
-    .then(d => {
-      if (!d || !Array.isArray(d.services) || !d.services.length) return;
-      update(() => {
-        state.catalog = d.services;
-        state.activeSvc = null;
-        state.activeCmd = null;
-        resetValues();
-        state.search = "";
-        state.svcFilter = "";
-        state.cmdFilter = "";
-      });
-    })
-    .catch(() => { });
+  CLOUD_IDS.forEach(loadCatalog);
 }
 
 init();
