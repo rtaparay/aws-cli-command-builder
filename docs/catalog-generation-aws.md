@@ -40,7 +40,7 @@ Commands written by hand in the AWS CLI that are not in the models are not gener
 
 ## 3. Installation (one time)
 
-Run these from the project root (`aws-cli-command-builder/`).
+Run these from the project root (`open-cli-builder/`).
 
 ### 3.1 Create the virtual environment
 

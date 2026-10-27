@@ -31,7 +31,7 @@ Nothing needs to be configured manually in the Vercel dashboard.
 
 ```bash
 npm install -g vercel
-cd aws-cli-command-builder
+cd open-cli-builder
 vercel login
 vercel              # first deployment (preview)
 vercel --prod       # production deployment

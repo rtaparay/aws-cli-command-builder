@@ -80,8 +80,8 @@ docker compose version
 Option A: clone from Git:
 
 ```bash
-git clone https://github.com/<user>/aws-cli-command-builder.git
-cd aws-cli-command-builder
+git clone https://github.com/<user>/open-cli-builder.git
+cd open-cli-builder
 ```
 
 If the repository is private, use a read-only deploy key or a personal access token with read permission. Do not leave credentials in the repository.
@@ -92,7 +92,7 @@ Option B: copy from your machine with `scp` (no Git on the server):
 # From your machine, in the project root
 tar --exclude=node_modules --exclude=dist --exclude=.git -czf app.tar.gz .
 scp -i ~/key.pem app.tar.gz ec2-user@<ELASTIC_IP>:~
-ssh -i ~/key.pem ec2-user@<ELASTIC_IP> 'mkdir -p ~/aws-cli-command-builder && tar -xzf ~/app.tar.gz -C ~/aws-cli-command-builder'
+ssh -i ~/key.pem ec2-user@<ELASTIC_IP> 'mkdir -p ~/open-cli-builder && tar -xzf ~/app.tar.gz -C ~/open-cli-builder'
 ```
 
 ## 5. Build and start
@@ -134,7 +134,7 @@ docker compose up -d --build
 ## 6. Update the version
 
 ```bash
-cd ~/aws-cli-command-builder
+cd ~/open-cli-builder
 git pull                                  # or copy the tar again
 docker build -t cli-command-builder:latest .
 docker rm -f cli-builder

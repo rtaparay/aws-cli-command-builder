@@ -1,8 +1,8 @@
-# aws-cli-command-builder — Project Documentation
+# open-cli-builder — Project Documentation
 
 ## 1. What it is
 
-**Open CLI Builder** (package `aws-cli-command-builder`) is a web application that helps you build **AWS CLI v2** commands without memorizing service names, subcommands, or flags. Users browse the catalog of services and commands, fill in the parameters in a form, and get the final command ready to copy and paste into a terminal.
+**Open CLI Builder** (package `open-cli-builder`) is a web application that helps you build **AWS CLI v2** commands without memorizing service names, subcommands, or flags. Users browse the catalog of services and commands, fill in the parameters in a form, and get the final command ready to copy and paste into a terminal.
 
 The catalog is generated from the **botocore** *service models* (the library AWS CLI uses under the hood), so it covers every service and command in the CLI, not just a subset.
 

@@ -45,7 +45,7 @@ vercel switch
 Linking connects the local folder to a Vercel project. It creates a `.vercel/` folder in the project root with the project and org IDs.
 
 ```bash
-cd aws-cli-command-builder
+cd open-cli-builder
 vercel link
 ```
 
@@ -53,7 +53,7 @@ The CLI asks:
 
 1. Which scope (account or team) to use.
 2. Whether to link to an existing project or create a new one.
-3. The project name (for example `aws-cli-command-builder`).
+3. The project name (for example `open-cli-builder`).
 4. The root directory (press Enter for `./`, the project root).
 
 The CLI detects Vite and uses the settings from `vercel.json`. No manual configuration is needed.
@@ -67,7 +67,7 @@ The CLI detects Vite and uses the settings from `vercel.json`. No manual configu
 To link without prompts (for example in a script), pass the project explicitly:
 
 ```bash
-vercel link --yes --project aws-cli-command-builder
+vercel link --yes --project open-cli-builder
 ```
 
 ## 4. Deploy
