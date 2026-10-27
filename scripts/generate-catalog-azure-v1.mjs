@@ -5,7 +5,7 @@
 //   npm run catalog
 //   npm run catalog -- --services vm,storage,group --out public/catalog.json
 //
-// Default (fast) mode: dump_commands.py loads azure-cli's command table in one Python process.
+// Default (fast) mode: generate-catalog-azure-dump.py loads azure-cli's command table in one Python process.
 //   --python <path> or AZ_PYTHON selects the Python that has azure-cli (default: the one `az` runs).
 // `--mode help`: the original crawler, one `az <group> ... -h` per group and command (~1 hour for a
 //   full run). `--concurrency` only applies to this mode.
@@ -255,10 +255,10 @@ function locatePython() {
   return process.platform === 'win32' ? 'python' : 'python3';
 }
 
-// Fast path: one Python process loads azure-cli's command table and prints it as JSON (see dump_commands.py).
+// Fast path: one Python process loads azure-cli's command table and prints it as JSON (see generate-catalog-azure-dump.py).
 async function mainFromPython() {
   const python = locatePython();
-  const script = join(dirname(fileURLToPath(import.meta.url)), 'dump_commands.py');
+  const script = join(dirname(fileURLToPath(import.meta.url)), 'generate-catalog-azure-dump.py');
   const args = ['-I', script];
   if (opts.services) args.push('--services', opts.services.join(','));
 

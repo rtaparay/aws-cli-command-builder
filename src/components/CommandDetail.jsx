@@ -8,7 +8,7 @@ function Preview({ svc, cmd, values, globals }) {
   const parts = commandParts(svc, cmd, values, globals);
   const lines = [
     <span key="head">
-      <span className="k">{cliFor(svc)}</span> <span className="svc">{svc.id}</span> <span className="cmd">{cmd.name}</span>
+      <span className="k">{cliFor(svc)}</span> {!(svc.cloud === 'azure' && svc.id === 'general') && <span className="svc">{svc.id}</span>} <span className="cmd">{cmd.name}</span>
       {parts.length > 0 && <span className="cont"> \</span>}
     </span>,
   ];

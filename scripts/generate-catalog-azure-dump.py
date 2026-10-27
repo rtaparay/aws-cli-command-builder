@@ -5,7 +5,7 @@ for each of the ~6,000 commands. It must run with the Python that has azure-cli 
 (for the packaged CLI that is /opt/az/bin/python3, see generate-catalog.mjs --python).
 
 Usage:
-  python dump_commands.py [--services vm,storage]
+  python generate-catalog-azure-dump.py [--services vm,storage]
 
 Progress and warnings go to stderr; stdout carries only the JSON document:
   { "version": "2.91.0", "groups": { "<service>": "<description>" },
@@ -169,12 +169,17 @@ def main():
     commands = []
     groups = {}
     for name, command in sorted(loader.command_table.items()):
-        service = name.split(' ', 1)[0]
-        if ' ' not in name or (services and service not in services):
-            continue  # root-level commands (login, logout…) are not part of the catalog
-        commands.append(build_command(name, command, helps, registry))
+        # Root-level commands (login, logout, rest, version…) are grouped under a pseudo-service "general".
+        root = ' ' not in name
+        service = 'general' if root else name.split(' ', 1)[0]
+        if services and service not in services:
+            continue
+        built = build_command(name, command, helps, registry)
+        if root:
+            built['name'] = 'general ' + name
+        commands.append(built)
         if service not in groups:
-            groups[service] = one_line(yaml_help(helps, service).get('short-summary'))
+            groups[service] = 'Root-level commands (login, logout, rest, version…).' if root else one_line(yaml_help(helps, service).get('short-summary'))
     log(f'dumped {len(commands)} commands in {len(groups)} services')
     json.dump({'version': __version__, 'groups': groups, 'commands': commands}, sys.stdout)
 

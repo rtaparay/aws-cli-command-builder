@@ -1,5 +1,5 @@
 {
-  "name": "aws-cli-command-builder",
+  "name": "open-cli-builder",
   "private": true,
   "version": "1.0.0",
   "type": "module",

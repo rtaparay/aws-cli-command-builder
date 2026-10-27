@@ -26,7 +26,8 @@ export function commandParts(svc, cmd, values, globals) {
 // Command as plain text, ready to copy.
 export function previewPlain(svc, cmd, values, globals) {
   const parts = commandParts(svc, cmd, values, globals).map(p => (p.val == null ? p.flag : `${p.flag} ${p.val}`));
-  return `${cliFor(svc)} ${svc.id} ${cmd.name}${parts.length ? ' ' + parts.join(' ') : ''}`;
+  const head = svc.cloud === 'azure' && svc.id === 'general' ? cliFor(svc) : `${cliFor(svc)} ${svc.id}`; // root commands: az login, az rest…
+  return `${head} ${cmd.name}${parts.length ? ' ' + parts.join(' ') : ''}`;
 }
 
 export function missingCount(cmd, values) {
