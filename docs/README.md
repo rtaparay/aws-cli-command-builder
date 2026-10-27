@@ -5,6 +5,7 @@ Index of the technical documentation for the project. For an overview (what it i
 | Document | Contents |
 |---|---|
 | [architecture.md](architecture.md) | Code structure, data flow, state, catalog, and AI assistant. |
+| [catalog-generation.md](catalog-generation.md) | Installing botocore and running `npm run catalog` to regenerate `public/catalog.json`. |
 | [deployment-vercel.md](deployment-vercel.md) | Publishing as a static site on Vercel (dashboard, Git integration, domains). |
 | [deployment-vercel-cli.md](deployment-vercel-cli.md) | Deploying from the terminal with the Vercel CLI. |
 | [deployment-docker-local.md](deployment-docker-local.md) | Building and running the Docker image on your machine. |
