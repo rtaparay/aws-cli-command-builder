@@ -1,8 +1,8 @@
-"""Dumps the Azure CLI command table as JSON on stdout (consumed by generate-catalog.mjs).
+"""Dumps the Azure CLI command table as JSON on stdout (consumed by generate-catalog-azure-v1.mjs).
 
 It loads every command and argument definition once, in-process, instead of running `az <cmd> -h`
 for each of the ~6,000 commands. It must run with the Python that has azure-cli installed
-(for the packaged CLI that is /opt/az/bin/python3, see generate-catalog.mjs --python).
+(for the packaged CLI that is /opt/az/bin/python3, see generate-catalog-azure-v1.mjs --python).
 
 Usage:
   python generate-catalog-azure-dump.py [--services vm,storage]

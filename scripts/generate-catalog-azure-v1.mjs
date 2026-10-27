@@ -1,9 +1,9 @@
-// Generates public/catalog.json from the Azure CLI. Each top-level group becomes a service; the
+// Generates public/catalog-azure.json from the Azure CLI. Each top-level group becomes a service; the
 // commands below it (any depth) become its commands.
 //
 // Usage (requires the `az` command installed and on PATH, or AZ_BIN set):
-//   npm run catalog
-//   npm run catalog -- --services vm,storage,group --out public/catalog.json
+//   npm run catalog:azure
+//   npm run catalog:azure -- --services vm,storage,group --out public/catalog-azure.json
 //
 // Default (fast) mode: generate-catalog-azure-dump.py loads azure-cli's command table in one Python process.
 //   --python <path> or AZ_PYTHON selects the Python that has azure-cli (default: the one `az` runs).
@@ -31,7 +31,7 @@ function parseArgs(argv) {
     mode: 'fast',
     services: null,
     concurrency: 8,
-    out: resolve(ROOT, 'public/catalog.json'),
+    out: resolve(ROOT, 'public/catalog-azure.json'),
   };
   for (let i = 0; i < argv.length; i++) {
     const key = argv[i];

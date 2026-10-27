@@ -1,10 +1,12 @@
-# Catalog generation
+# Catalog generation (AWS)
 
-This document explains how `public/catalog.json` is generated and how to regenerate it. For the file format, see the root [README.md](../README.md); for how the app consumes it, see [architecture.md](architecture.md).
+The Azure catalog has its own generator; see [catalog-generation-azure.md](catalog-generation-azure.md).
+
+This document explains how `public/catalog-aws.json` is generated and how to regenerate it. For the file format, see the root [README.md](../README.md); for how the app consumes it, see [architecture.md](architecture.md).
 
 ## 1. How it works
 
-The catalog is built by `scripts/generate-catalog.mjs` from the **botocore service models**: the JSON files that the AWS CLI itself is generated from. There is no official API that lists AWS CLI commands, and running `aws <service> <command> help` for every command would take ~19,000 process spawns. Reading the models directly:
+The catalog is built by `scripts/generate-catalog-aws-v1.mjs` from the **botocore service models**: the JSON files that the AWS CLI itself is generated from. There is no official API that lists AWS CLI commands, and running `aws <service> <command> help` for every command would take ~19,000 process spawns. Reading the models directly:
 
 - takes a few seconds;
 - does not need the AWS CLI, AWS credentials, or network access (once botocore is installed);
@@ -78,17 +80,17 @@ It should print a version such as `1.43.119`. The `.venv` folder is in `.gitigno
 ## 4. Running the script
 
 ```bash
-npm run catalog
+npm run catalog:aws
 ```
 
-This overwrites `public/catalog.json` (~23 MB) and prints a summary:
+This overwrites `public/catalog-aws.json` (~17 MB) and prints a summary:
 
 ```
 Reading the botocore 1.43.119 models in .../botocore/data (concurrency 8)…
 11%  50/435 services  (0m 1s)
 ...
 100%  435/435 services  (0m 6s)
-Wrote 435 services and 19474 commands to .../public/catalog.json in 0m 7s
+Wrote 435 services and 19474 commands to .../public/catalog-aws.json in 0m 7s
 ```
 
 Progress is exact (one model per service) and shows the elapsed time. In a terminal it updates in place; when the output is redirected (CI, logs) it prints a line every 50 services.
@@ -102,33 +104,33 @@ The `generated_from` field of the file records the botocore version used.
 | `--services a,b,c` | all | Generate only these services (by `id`). Useful for quick tests. |
 | `--concurrency <n>` | `8` | How many service models are read in parallel. Higher is faster until the disk/CPU is saturated (try 16). |
 | `--python <path>` | auto-detected | Python interpreter that has botocore installed. Also settable with `PYTHON_BIN`. |
-| `--out <path>` | `public/catalog.json` | Output file. |
+| `--out <path>` | `public/catalog-aws.json` | Output file. |
 | `--data <path>` | auto-detected | Path to a `botocore/data` directory. Also settable with the `BOTOCORE_DATA` environment variable. |
 
 Examples:
 
 ```bash
 # Quick test without touching the real catalog
-npm run catalog -- --services ec2,s3,iam --out /tmp/catalog-test.json
+npm run catalog:aws -- --services ec2,s3,iam --out /tmp/catalog-test.json
 
 # Read faster with more parallelism
-npm run catalog -- --concurrency 16
+npm run catalog:aws -- --concurrency 16
 
 # Less parallelism on a slow disk or a small machine
-npm run catalog -- --concurrency 4
+npm run catalog:aws -- --concurrency 4
 
 # Use a specific Python that has botocore (e.g. a venv outside the project)
-npm run catalog -- --python ~/envs/aws/bin/python
-PYTHON_BIN=~/envs/aws/bin/python npm run catalog          # same, with the env variable
+npm run catalog:aws -- --python ~/envs/aws/bin/python
+PYTHON_BIN=~/envs/aws/bin/python npm run catalog:aws          # same, with the env variable
 
 # Windows (PowerShell)
-npm run catalog -- --python C:\envs\aws\Scripts\python.exe --concurrency 16
+npm run catalog:aws -- --python C:\envs\aws\Scripts\python.exe --concurrency 16
 
 # Combine options: two services, 16 workers, custom output
-npm run catalog -- --services ec2,s3 --concurrency 16 --out /tmp/catalog-test.json
+npm run catalog:aws -- --services ec2,s3 --concurrency 16 --out /tmp/catalog-test.json
 
 # Use an extracted copy of botocore instead of an installed one
-npm run catalog -- --data /path/to/botocore/data
+npm run catalog:aws -- --data /path/to/botocore/data
 ```
 
 Tip: the arguments after `--` go to the script; without the `--`, npm would swallow them.
@@ -149,12 +151,12 @@ New AWS services and parameters appear in botocore releases (several times a wee
 
 ```bash
 .venv/bin/pip install --upgrade botocore
-npm run catalog
-git diff --stat public/catalog.json     # review the change
+npm run catalog:aws
+git diff --stat public/catalog-aws.json     # review the change
 npm run build                           # make sure the app still builds
 ```
 
-Then commit `public/catalog.json` and deploy as usual (see [deployment-vercel.md](deployment-vercel.md)).
+Then commit `public/catalog-aws.json` (the app loads it at startup; there is no bundled sample) and deploy as usual (see [deployment-vercel.md](deployment-vercel.md)).
 
 ## 6. Troubleshooting
 
@@ -165,4 +167,4 @@ Then commit `public/catalog.json` and deploy as usual (see [deployment-vercel.md
 | `externally-managed-environment` from pip | You are installing into the system Python. Use the venv (`.venv/bin/pip …`). |
 | `python3: command not found` (Windows) | Use `python` / `py -3` instead of `python3`. |
 | Catalog looks outdated in the browser | Hard refresh (`Ctrl+Shift+R`); the file is cached by the browser/CDN. |
-| Only a few services appear in the app | The app fell back to `awsSampleCatalog.js`: `catalog.json` was not loaded (opened with `file://` or missing). Use `npm run dev` / `npm run preview`. |
+| The AWS card shows "loading catalog…" forever or "catalog failed to load" | `public/catalog-aws.json` was not loaded (missing, or the app was opened with `file://`). The app has no bundled sample data any more. Generate the file and use `npm run dev` / `npm run preview`. |

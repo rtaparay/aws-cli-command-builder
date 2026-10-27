@@ -1,4 +1,4 @@
-# Documentation — CLI Command Builder
+# Documentation — Open CLI Builder
 
 Index of the technical documentation for the project. For an overview (what it is, features, usage), see the root [README.md](../README.md).
 

@@ -1,4 +1,4 @@
-// Generates public/catalog.json from the botocore service models (the same JSON models the AWS CLI is built on).
+// Generates public/catalog-aws.json from the botocore service models (the same JSON models the AWS CLI is built on).
 // Each service directory becomes a service; each operation becomes a command (`aws <service> <operation>`),
 // and the members of the operation input become its parameters.
 //
@@ -6,11 +6,11 @@
 // faster (seconds instead of ~19k process spawns) and needs no AWS CLI, credentials or network.
 //
 // Usage (needs botocore, e.g. in a .venv: `python3 -m venv .venv && .venv/bin/pip install botocore`, or point --data at an extracted copy of botocore/data):
-//   npm run catalog
-//   npm run catalog -- --services ec2,s3,iam --out public/catalog.json
-//   npm run catalog -- --concurrency 16
-//   npm run catalog -- --data /path/to/botocore/data
-//   npm run catalog -- --python /path/to/python
+//   npm run catalog:aws
+//   npm run catalog:aws -- --services ec2,s3,iam --out public/catalog-aws.json
+//   npm run catalog:aws -- --concurrency 16
+//   npm run catalog:aws -- --data /path/to/botocore/data
+//   npm run catalog:aws -- --python /path/to/python
 //
 // Not covered: hand-written CLI commands that are not in the models (`aws s3 cp/sync`, `aws configure`, …).
 
@@ -27,7 +27,7 @@ const DESC_MAX = 220;
 const gunzipAsync = promisify(gunzip);
 
 function parseArgs(argv) {
-  const opts = { data: process.env.BOTOCORE_DATA || null, python: process.env.PYTHON_BIN || null, services: null, concurrency: 8, out: resolve(ROOT, 'public/catalog.json') };
+  const opts = { data: process.env.BOTOCORE_DATA || null, python: process.env.PYTHON_BIN || null, services: null, concurrency: 8, out: resolve(ROOT, 'public/catalog-aws.json') };
   for (let i = 0; i < argv.length; i++) {
     const key = argv[i];
     const value = argv[i + 1];

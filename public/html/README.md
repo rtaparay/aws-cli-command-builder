@@ -1,4 +1,4 @@
-# CLI Command Builder — AWS + Azure
+# Open CLI Builder — AWS + Azure
 
 Constructor de comandos `aws …` y `az …` paso a paso. Misma arquitectura que la versión AWS (estado único en `app.js`, `update()` → `render()`, sin frameworks).
 

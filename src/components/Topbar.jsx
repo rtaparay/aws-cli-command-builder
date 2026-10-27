@@ -11,7 +11,7 @@ export default function Topbar({ placeholder, search, onSearch, dark, onToggleTh
           </svg>
         </span>
         <div style={{ minWidth: 0 }}>
-          <h1>CLI <b>Command</b> Builder</h1>
+          <h1>Open <b>CLI</b> Builder</h1>
           <div className="sub">AWS + Azure CLI · step by step</div>
         </div>
       </div>
