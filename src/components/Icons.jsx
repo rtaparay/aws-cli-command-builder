@@ -96,3 +96,10 @@ export const SourceIcon = () => (
     <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
   </Svg>
 );
+
+export const LayersIcon = () => (
+  <Svg>
+    <path d="M12 3 2 8l10 5 10-5-10-5z" />
+    <path d="m2 13 10 5 10-5" />
+  </Svg>
+);

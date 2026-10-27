@@ -25,12 +25,13 @@ export function saveSettings(settings) {
   writeStorage("cli-ai-base-" + settings.provider, settings.base);
 }
 
-export function useAssistant() {
+export function useAssistant(initialCloud = 'aws') {
   const [config, setConfig] = useState(loadActiveSettings);
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [cfgOpen, setCfgOpen] = useState(false);
+  const [cloud, setCloudState] = useState(initialCloud); // target CLI of the conversation
 
   const push = message => setMessages(list => [...list, message]);
 
@@ -47,7 +48,7 @@ export function useAssistant() {
     setDraft("");
     setBusy(true);
     try {
-      const reply = await askAssistant(config, history);
+      const reply = await askAssistant(config, history, cloud);
       push({ role: "assistant", content: reply || "…" });
     } catch (e) {
       push({ role: "assistant", content: "⚠️ Error querying the AI: " + ((e && e.message) ? e.message : e) });
@@ -61,8 +62,17 @@ export function useAssistant() {
     setCfgOpen(false);
   }
 
+  // Switching the target CLI starts a new conversation (the prompt is different).
+  function setCloud(next) {
+    if (next === cloud) return;
+    setCloudState(next);
+    setMessages([]);
+  }
+
   return {
     config,
+    cloud,
+    setCloud,
     messages,
     draft,
     setDraft,

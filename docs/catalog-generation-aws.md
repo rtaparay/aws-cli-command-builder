@@ -165,4 +165,4 @@ Then commit `public/catalog.json` and deploy as usual (see [deployment-vercel.md
 | `externally-managed-environment` from pip | You are installing into the system Python. Use the venv (`.venv/bin/pip …`). |
 | `python3: command not found` (Windows) | Use `python` / `py -3` instead of `python3`. |
 | Catalog looks outdated in the browser | Hard refresh (`Ctrl+Shift+R`); the file is cached by the browser/CDN. |
-| Only a few services appear in the app | The app fell back to `sampleCatalog.js`: `catalog.json` was not loaded (opened with `file://` or missing). Use `npm run dev` / `npm run preview`. |
+| Only a few services appear in the app | The app fell back to `awsSampleCatalog.js`: `catalog.json` was not loaded (opened with `file://` or missing). Use `npm run dev` / `npm run preview`. |

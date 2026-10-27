@@ -36,13 +36,15 @@ This builder reflects the **Command Reference** structure: the catalog is organi
 | `src/components/` | UI components: `Topbar`, `ServicePane`, `CommandPane`, `CommandDetail`, `Home`, `AssistantCard`, `GlobalOptions`, `Icons`. |
 | `src/hooks/useAssistant.js` | AI assistant state: per-provider configuration, messages, and sending. |
 | `src/lib/` | Logic without UI: `command.js` (command building), `globalOptions.js`, `ai.js` (provider calls), `clipboard.js`, `storage.js`. |
-| `src/data/sampleCatalog.js` | Sample catalog bundled as an offline fallback. |
+| `src/data/awsSampleCatalog.js` | Sample catalog bundled as an offline fallback. |
 | `src/styles.css` | Styles: color variables for light/dark theme, layout, and components. |
-| `public/catalog.json` | Full AWS CLI v2 catalog (~23 MB). Contains 435 services and 19,437 commands. Served as-is at the root. |
+| `public/catalog-aws.json` | Full AWS CLI v2 catalog (435 services, ~19,470 commands). Served as-is at the root. |
+| `public/catalog-azure.json` | Full Azure CLI catalog (91 services, ~6,090 commands). Accepts the app format or the raw `dump_commands.py` output. |
+| `src/lib/clouds.js` | Cloud registry (AWS, Azure, upcoming OCI/GCP). Adding a cloud = one entry here. |
 | `.nvmrc` | Node version used by the project (`26`, LTS). |
 | `vercel.json` | Vercel deployment settings (Vite build, output in `dist/`). |
 
-### `catalog.json` format
+### `catalog-aws.json` / `catalog-azure.json` format
 
 Real example with the EC2 service (one command, excerpt from `public/catalog.json`):
 
@@ -113,7 +115,7 @@ npm run build      # generates dist/
 npm run preview    # serves dist/ locally
 ```
 
-With `npm run dev` or `npm run preview` the app is served over HTTP and loads `catalog.json` without issues. Opening `index.html` directly with `file://` does not work: the browser blocks loading `catalog.json`, and the app shows only the embedded sample.
+With `npm run dev` or `npm run preview` the app is served over HTTP and loads `catalog-aws.json` / `catalog-azure.json` without issues. Opening `index.html` directly with `file://` does not work: the browser blocks loading `catalog-aws.json` / `catalog-azure.json`, and the app shows only the embedded sample.
 
 ### Usage
 
@@ -184,7 +186,7 @@ Configuration: provider, model, API key, and base URL (only for the custom optio
 - **Typefaces:** Google Fonts (Space Grotesk, IBM Plex Mono).
 - **Persistence:** preferences in `localStorage` (see the table below). All access goes through `src/lib/storage.js`, which tolerates browsers with blocked storage.
 - **Catalog loading:**
-  1. On startup, the app uses the sample in `src/data/sampleCatalog.js` so it works without network access.
+  1. On startup, the app uses the sample in `src/data/awsSampleCatalog.js` so it works without network access.
   2. It then calls `fetch(BASE_URL + 'catalog.json')` and, if the response is successful, replaces the sample with the full catalog.
 
 ### Main pieces
@@ -220,15 +222,15 @@ Configuration: provider, model, API key, and base URL (only for the custom optio
 
 ## 7. Known limitations
 
-- Without access to `catalog.json`, only the embedded sample with a few services is available.
+- Without access to `catalog-aws.json` / `catalog-azure.json`, only the embedded sample with a few services is available.
 - The catalog matches the botocore version listed in `generated_from` (currently `botocore 1.43.118`). To update it, regenerate `public/catalog.json` from a newer botocore version; the generator script is not included in the repository.
-- `catalog.json` is about 23 MB; the first load may be slow on slow connections.
+- `catalog-aws.json` / `catalog-azure.json` is about 23 MB; the first load may be slow on slow connections.
 - The AI assistant depends on the availability and quotas of the chosen provider.
 
 ## 8. Possible improvements
 
-- Include the script that generates `catalog.json` from botocore, so it can be updated.
-- Compress `catalog.json` (gzip) or split it per service to reduce the initial load.
+- Include the script that generates `catalog-aws.json` / `catalog-azure.json` from botocore, so it can be updated.
+- Compress `catalog-aws.json` / `catalog-azure.json` (gzip) or split it per service to reduce the initial load.
 - Add automated tests (Vitest) for command building (`src/lib/command.js`).
 - Export or save favorite commands.
 - Support for other CLIs (for example, Azure) in the future.

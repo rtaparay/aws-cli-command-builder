@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "catalog": "node scripts/generate-catalog.mjs"
+    "catalog:aws": "node scripts/generate-catalog-aws-v1.mjs --out public/catalog-aws.json",
+    "catalog:azure": "node scripts/generate-catalog-azure-v1.mjs --out public/catalog-azure.json"
   },
   "dependencies": {
     "react": "^19.3.1",

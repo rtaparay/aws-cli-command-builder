@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { AI_PROVIDERS } from '../lib/ai.js';
 import { loadSettings } from '../hooks/useAssistant.js';
+import CloudMark from './CloudMark.jsx';
+import { CLOUDS, CLOUD_IDS } from '../lib/clouds.js';
 
 const KEY_PLACEHOLDERS = { gemini: "AIza…", claude: "sk-ant-…", openai: "sk-…", custom: "—" };
 
@@ -100,9 +102,10 @@ function ConfigPanel({ config, onSave }) {
 
 // AI assistant chat. State lives in useAssistant (App), so it survives navigation.
 export default function AssistantCard({ assistant, onCopy }) {
-  const { config, messages, draft, setDraft, busy, cfgOpen, toggleCfg, clear, send, saveConfig } = assistant;
+  const { config, cloud, setCloud, messages, draft, setDraft, busy, cfgOpen, toggleCfg, clear, send, saveConfig } = assistant;
   const transcriptRef = useRef(null);
   const provider = AI_PROVIDERS[config.provider];
+  const c = CLOUDS[cloud];
 
   useEffect(() => {
     if (transcriptRef.current) transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight;
@@ -114,11 +117,25 @@ export default function AssistantCard({ assistant, onCopy }) {
         <div className="ai-title">
           <span className="ai-badge">AI</span>
           <div style={{ minWidth: 0 }}>
-            <div className="ai-h1">AI Assistant — AWS CLI Commands</div>
-            <div className="ai-h2">Describe what you want to do in AWS and the AI will give you the command.</div>
+            <div className="ai-h1">AI Assistant — {c.short} CLI Commands</div>
+            <div className="ai-h2">Describe what you want to do in {c.short} and the AI will give you the {c.cli} command.</div>
           </div>
         </div>
         <div className="ai-head-acts">
+          <div className="seg" role="group" aria-label="Target CLI">
+            {CLOUD_IDS.map(id => (
+              <button
+                key={id}
+                className={'seg-btn ' + id}
+                aria-pressed={id === cloud}
+                title={'Generate ' + CLOUDS[id].cliName + ' commands'}
+                onClick={() => setCloud(id)}
+              >
+                <CloudMark cloud={id} size="xs" />
+                {CLOUDS[id].short}
+              </button>
+            ))}
+          </div>
           <span className="ai-prov">{provider.label}</span>
           <button className="ai-mini" onClick={clear}>Clear chat</button>
           <button className="ai-mini" onClick={toggleCfg}>Settings</button>
@@ -159,11 +176,11 @@ export default function AssistantCard({ assistant, onCopy }) {
               send();
             }
           }}
-          placeholder="Describe what you want to do in AWS… (e.g. list S3 buckets)"
+          placeholder={`Describe what you want to do in ${c.short}… (e.g. ${c.searchHint})`}
         />
         <button className="ai-send" disabled={busy} onClick={send}>Send</button>
       </div>
-      <div className="ai-foot">Only generates AWS CLI v2 commands. Review each command before running it.</div>
+      <div className="ai-foot">Only generates {c.cliName} commands. Review each command before running it.</div>
     </div>
   );
 }

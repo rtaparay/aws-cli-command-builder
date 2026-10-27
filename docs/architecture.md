@@ -56,7 +56,7 @@ There are no state, routing, or component libraries. The project uses only React
 | `src/components/` | UI components (see section 4). |
 | `src/hooks/useAssistant.js` | State and logic for the AI assistant chat. |
 | `src/lib/` | Pure logic and utilities without React (see section 5). |
-| `src/data/sampleCatalog.js` | Sample catalog bundled into the build, used as a fallback. |
+| `src/data/awsSampleCatalog.js` | Sample catalog bundled into the build, used as a fallback. |
 | `src/styles.css` | Styles, color tokens for light and dark themes, and responsive layout. |
 | `public/catalog.json` | Full AWS CLI v2 catalog (~23 MB). Copied as-is to the site root. |
 | `dist/` | Output of `npm run build`. **Not versioned** (it is in `.gitignore`). |
@@ -123,7 +123,7 @@ All navigation state lives in `App.jsx`. Neither Context nor Redux is used.
 
 | State | Type | Meaning |
 |---|---|---|
-| `catalog` | `Service[]` | Active catalog. Starts as `SAMPLE_CATALOG`. |
+| `catalog` | `Service[]` | Active catalog. Starts as `AWS_SAMPLE_CATALOG`. |
 | `activeSvc` / `activeCmd` | object or `null` | Selected service and command. |
 | `values` | `{ [flag]: string }` | Values typed into the form of the active command. |
 | `search` / `svcFilter` / `cmdFilter` | `string` | Global search filter and per-panel filters. |
@@ -133,7 +133,7 @@ All navigation state lives in `App.jsx`. Neither Context nor Redux is used.
 
 ### Catalog loading cycle
 
-1. On mount, the catalog is `SAMPLE_CATALOG` (a few services bundled in the build). The app is usable immediately.
+1. On mount, the catalog is `AWS_SAMPLE_CATALOG` (empty) until `public/catalog-aws.json` loads.
 2. It calls `fetch(import.meta.env.BASE_URL + 'catalog.json')`.
 3. If the response is successful and `services` is not empty, it replaces the catalog and resets the selection.
 4. If it fails (no network, `file://`, HTTP error), **the sample is kept** and no error is shown.
@@ -182,7 +182,7 @@ Below 1040 px (`NARROW_QUERY`), selecting a service or command smoothly scrolls 
 
 The catalog is generated from the service models of **botocore**, the library AWS CLI v2 uses. The source version is in `generated_from`. **The generator script is not in the repository**, so updating the catalog requires regenerating it manually.
 
-### Why `sampleCatalog.js` exists
+### Why `awsSampleCatalog.js` exists
 
 So the app works without network access or under `file://`, where the catalog `fetch` fails. It is a small subset and is not kept in sync with the full catalog.
 

@@ -7,7 +7,7 @@
   "cleanUrls": true,
   "headers": [
     {
-      "source": "/catalog.json",
+      "source": "/catalog-(aws|azure).json",
       "headers": [
         {
           "key": "Cache-Control",

@@ -1,9 +1,9 @@
 import { GearIcon, HomeIcon, MoonIcon, SearchIcon, SidebarIcon, SunIcon } from './Icons.jsx';
 
-export default function Topbar({ search, onSearch, dark, onToggleTheme, onToggleSidebar, onHome, onOpenGlobals }) {
+export default function Topbar({ placeholder, search, onSearch, dark, onToggleTheme, onToggleSidebar, onHome, onOpenGlobals }) {
   return (
     <header className="topbar">
-      <div className="brand">
+      <div className="brand" role="button" tabIndex={0} title="Home" style={{ cursor: 'pointer' }} onClick={onHome} onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onHome()}>
         <span className="logo">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 7l4 5-4 5" />
@@ -12,7 +12,7 @@ export default function Topbar({ search, onSearch, dark, onToggleTheme, onToggle
         </span>
         <div style={{ minWidth: 0 }}>
           <h1>CLI <b>Command</b> Builder</h1>
-          <div className="sub">Create AWS CLI commands step by step</div>
+          <div className="sub">AWS + Azure CLI · step by step</div>
         </div>
       </div>
       <span className="divider" />
@@ -29,7 +29,7 @@ export default function Topbar({ search, onSearch, dark, onToggleTheme, onToggle
         <SearchIcon />
         <input
           type="search"
-          placeholder="Search commands…"
+          placeholder={placeholder}
           autoComplete="off"
           spellCheck={false}
           value={search}

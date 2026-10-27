@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { CLI, commandParts, missingCount, previewPlain } from '../lib/command.js';
+import CloudMark from './CloudMark.jsx';
+import { CLOUDS } from '../lib/clouds.js';
+import { cliFor, commandParts, missingCount, previewPlain } from '../lib/command.js';
 import { CopyIcon, WarnIcon } from './Icons.jsx';
 
 function Preview({ svc, cmd, values, globals }) {
-  const parts = commandParts(cmd, values, globals);
+  const parts = commandParts(svc, cmd, values, globals);
   const lines = [
     <span key="head">
-      <span className="k">{CLI}</span> <span className="svc">{svc.id}</span> <span className="cmd">{cmd.name}</span>
+      <span className="k">{cliFor(svc)}</span> <span className="svc">{svc.id}</span> <span className="cmd">{cmd.name}</span>
       {parts.length > 0 && <span className="cont"> \</span>}
     </span>,
   ];
@@ -89,6 +91,12 @@ export default function CommandDetail({ svc, cmd, values, globals, onChange, onC
 
   return (
     <div className="detail-in">
+      <div className="crumb-cloud">
+        <CloudMark cloud={svc.cloud} size="xs" />
+        <span>{CLOUDS[svc.cloud].name}</span>
+        <span className="sep">/</span>
+        <span>{(svc.name || svc.id).replace(/\.$/, '')}</span>
+      </div>
       <div className="crumb">
         {svc.id} <b>{cmd.name}</b>
       </div>
@@ -126,7 +134,15 @@ export default function CommandDetail({ svc, cmd, values, globals, onChange, onC
       )}
 
       <div className="note">
-        This is a <b>functional recreation</b> of the command builder pattern. The data is a sample subset of the <b>AWS CLI v2</b> catalog. The full catalog is generated from the <b>botocore service models</b> (JSON, Apache-2.0) — this page makes no calls to AWS; it only composes the <code>aws …</code> string.
+        {svc.cloud === 'azure' ? (
+          <>
+            Functional recreation of the command builder pattern for the <b>Azure CLI</b>. The full catalog is generated from the <b>azure-cli command modules</b> (MIT) — this page makes no calls to Azure; it only composes the <code>az …</code> string.
+          </>
+        ) : (
+          <>
+            This is a <b>functional recreation</b> of the command builder pattern. The catalog of the <b>AWS CLI v2</b> is generated from the <b>botocore service models</b> (JSON, Apache-2.0) — this page makes no calls to AWS; it only composes the <code>aws …</code> string.
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,4 +1,6 @@
-import { GLOBAL_OPTS } from '../lib/globalOptions.js';
+import CloudMark from './CloudMark.jsx';
+import { CLOUDS, CLOUD_IDS } from '../lib/clouds.js';
+import { GLOBAL_OPTS_BY_CLOUD } from '../lib/globalOptions.js';
 
 const TYPE_LABELS = { bool: "boolean", int: "integer" };
 
@@ -33,29 +35,41 @@ function Control({ opt, value, onChange }) {
   );
 }
 
-// Side panel with the AWS CLI global options (saved in the browser).
-export default function GlobalOptions({ open, globals, onChange, onClear, onClose }) {
+// Side panel with the global options of each cloud CLI (saved in the browser).
+export default function GlobalOptions({ open, cloud, onCloud, globals, onChange, onClear, onClose }) {
+  const values = globals[cloud] || {};
+  const c = CLOUDS[cloud];
   return (
     <>
       <div className="gopts-overlay" hidden={!open} onClick={onClose} />
-      <aside className="gopts" hidden={!open} aria-label="Global options">
+      <aside className="gopts" hidden={!open} data-cloud={cloud} aria-label="Global options">
         <div className="gopts-h">
           <div>
             <div className="gopts-t">Global options</div>
-            <div className="gopts-s">Options accepted by every AWS CLI command. They are applied to each command you build and persist across pages.</div>
+            <div className="gopts-s">
+              Options accepted by every {c.cliName} command ({c.cli} …). They are applied to each command you build and persist across pages.
+            </div>
+            <div className="seg gopts-tabs" role="group" aria-label="CLI">
+              {CLOUD_IDS.map(id => (
+                <button key={id} className={'seg-btn ' + id} aria-pressed={id === cloud} onClick={() => onCloud(id)}>
+                  <CloudMark cloud={id} size="xs" />
+                  {CLOUDS[id].cliName}
+                </button>
+              ))}
+            </div>
           </div>
           <button className="gopts-x" aria-label="Close" onClick={onClose}>✕</button>
         </div>
         <div className="gopts-b">
-          {GLOBAL_OPTS.map(o => {
-            const raw = globals[o.flag];
-            const value = o.type === "bool" ? (raw ? "1" : "") : raw != null ? String(raw) : "";
+          {GLOBAL_OPTS_BY_CLOUD[cloud].map(o => {
+            const raw = values[o.flag];
+            const value = o.type === 'bool' ? (raw ? '1' : '') : raw != null ? String(raw) : '';
             return (
-              <div key={o.flag} className="gopt">
+              <div key={cloud + o.flag} className="gopt">
                 <label>
-                  <span className="flag">{o.flag}</span> <span className="type">{TYPE_LABELS[o.type] || "string"}</span>
+                  <span className="flag">{o.flag}</span> <span className="type">{TYPE_LABELS[o.type] || 'string'}</span>
                 </label>
-                <Control opt={o} value={value} onChange={onChange} />
+                <Control opt={o} value={value} onChange={(flag, v) => onChange(cloud, flag, v)} />
                 <p className="hint">{o.hint}</p>
               </div>
             );
@@ -63,7 +77,7 @@ export default function GlobalOptions({ open, globals, onChange, onClear, onClos
         </div>
         <div className="gopts-foot">
           <span>Saved on this device.</span>
-          <button className="gopts-clear" onClick={onClear}>Clear all</button>
+          <button className="gopts-clear" onClick={() => onClear(cloud)}>Clear all</button>
         </div>
       </aside>
     </>

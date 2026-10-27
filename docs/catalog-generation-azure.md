@@ -182,4 +182,4 @@ Requirements and caveats are in the root [README.md](../README.md#updating-the-c
 | A group or command is missing | It is an extension or is not in the installed version. Check with `az <group> -h`. |
 | Catalog has only a few groups | It was generated with `--services`. Regenerate without that option. |
 | Catalog looks outdated in the browser | Hard refresh (`Ctrl+Shift+R`); the file is cached by the browser/CDN. |
-| Only a few groups appear in the app | The app fell back to `sampleCatalog.js`: `catalog.json` was not loaded (opened with `file://` or missing). Use `npm run dev` / `npm run preview`. |
+| Only a few groups appear in the app | The app fell back to `awsSampleCatalog.js`: `catalog.json` was not loaded (opened with `file://` or missing). Use `npm run dev` / `npm run preview`. |
